@@ -240,6 +240,7 @@ let rec token = lexbuf => {
     read_doc_comment(start_p, buf, lexbuf);
   | blank => token(lexbuf)
   | newlines => positioned(EOL)
+  | ".." => positioned(DOTDOT)
   | (unsigned_float, 'f') => positioned(FLOAT32(sub_lexeme(lexbuf, 0, -1)))
   | (unsigned_float, 'd') => positioned(FLOAT64(sub_lexeme(lexbuf, 0, -1)))
   | unsigned_float =>

@@ -339,6 +339,27 @@ module Expression = {
       );
     construct(~loc, ~attributes?, a, PExpConstrRecord(record_items));
   };
+  let range = (~loc, ~attributes=?, range_start, range_end) => {
+    record(
+      ~loc,
+      ~attributes?,
+      None,
+      [
+        (
+          Location.mknoloc(
+            Identifier.IdentName(Location.mknoloc("rangeStart")),
+          ),
+          range_start,
+        ),
+        (
+          Location.mknoloc(
+            Identifier.IdentName(Location.mknoloc("rangeEnd")),
+          ),
+          range_end,
+        ),
+      ],
+    );
+  };
   // It's difficult to parse rational numbers while division exists (in the
   // parser state where you've read NUMBER_INT and you're looking ahead at /,
   // you've got a shift/reduce conflict between reducing const -> NUMBER_INT

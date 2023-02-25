@@ -233,6 +233,9 @@ module Expression: {
     (~loc: loc, ~attributes: attributes=?, id, list(expression)) => expression;
   let record_construct:
     (~loc: loc, ~attributes: attributes=?, id, list(recorditem)) => expression;
+  let range:
+    (~loc: loc, ~attributes: attributes=?, expression, expression) =>
+    expression;
   let binop:
     (~loc: loc=?, ~attributes: attributes=?, expression, list(expression)) =>
     expression;
