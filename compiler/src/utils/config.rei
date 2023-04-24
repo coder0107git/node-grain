@@ -66,10 +66,6 @@ let stdlib_dir: ref(option(string));
 
 let color_enabled: ref(bool);
 
-/** Whether to use principal types when compiling */
-
-let principal: ref(bool);
-
 /** Initial number of WebAssembly memory pages */
 
 let initial_memory_pages: ref(int);
@@ -77,6 +73,10 @@ let initial_memory_pages: ref(int);
 /** Maximum number of WebAssembly memory pages */
 
 let maximum_memory_pages: ref(option(int));
+
+/** Import the memory from `env.memory` */
+
+let import_memory: ref(bool);
 
 /** Compilation mode to use when compiling */
 
@@ -86,21 +86,13 @@ let compilation_mode: ref(option(string));
 
 let statically_link: ref(bool);
 
-/** Enable tail-call optimizations */
+/** Disables tail-call optimizations */
 
-let experimental_tail_call: ref(bool);
-
-/** Whether to allow cyclic types. */
-
-let recursive_types: ref(bool);
+let no_tail_call: ref(bool);
 
 /** Whether non-terminal block expressions should be forced to return void */
 
 let strict_sequence: ref(bool);
-
-/** The debugging level to use for the parser. Primarily intended for Grain compiler developers. */
-
-let parser_debug_level: ref(int);
 
 /** Whether debugging information should be included in the compiled output. */
 

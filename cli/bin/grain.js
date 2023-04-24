@@ -1,20 +1,7 @@
 #!/usr/bin/env node
 
-// https://github.com/grain-lang/grain/issues/114
-const v8 = require("v8");
-/* From the Node.js docs:
- *
- *   The v8.setFlagsFromString() method can be used to programmatically set V8 command-line flags.
- *   This method should be used with care. Changing settings after the VM has started may result
- *   in unpredictable behavior, including crashes and data loss; or it may simply do nothing.
- *
- * This seems to work for our needs with Node 16, but we should be cautious when updating.
- */
-v8.setFlagsFromString("--experimental-wasm-return-call");
-
 const commander = require("commander");
 const exec = require("./exec.js");
-const run = require("./run.js");
 const pkgJson = require("../package.json");
 
 const stdlibPath = require("@grain/stdlib");
@@ -118,6 +105,8 @@ class GrainCommand extends commander.Command {
       "maximum number of WebAssembly memory pages",
       num
     );
+    cmd.forwardOption("--import-memory", "import the memory from `env.memory`");
+    cmd.option("--dir <dir...>", "directory to preopen");
     cmd.forwardOption(
       "--compilation-mode <mode>",
       "compilation mode (advanced use only)"
@@ -130,10 +119,7 @@ class GrainCommand extends commander.Command {
       "--release",
       "compile using the release profile (production mode)"
     );
-    cmd.forwardOption(
-      "--experimental-wasm-tail-call",
-      "enables tail-call optimization"
-    );
+    cmd.forwardOption("--no-wasm-tail-call", "disables tail-call optimization");
     cmd.forwardOption("--debug", "compile with debugging information");
     cmd.forwardOption(
       "--wat",
@@ -160,14 +146,9 @@ class GrainCommand extends commander.Command {
       "--use-start-section",
       "replaces the _start export with a start section during linking"
     );
-    cmd.forwardOption("--no-link", "disable static linking");
     cmd.forwardOption(
       "--no-pervasives",
       "don't automatically import the Grain Pervasives module"
-    );
-    cmd.forwardOption(
-      "--parser-debug-level <level>",
-      "debugging level for parser output"
     );
     cmd.forwardOption(
       "--memory-base <addr>",
@@ -194,14 +175,13 @@ program
   .command("compile-and-run <file>", { isDefault: true, hidden: true })
   // `--version` should only be available on the default command
   .version(pkgJson.version, "-v, --version", "output the current version")
-  .addOption(new commander.Option("-p, --print-output").hideHelp())
   .forwardOption("-o <filename>", "output filename")
   .action(function (file, options, program) {
     exec.grainc(file, options, program);
     if (options.o) {
-      run(options.o, options);
+      exec.grainrun(options.o, options, program);
     } else {
-      run(file.replace(/\.gr$/, ".gr.wasm"), options);
+      exec.grainrun(file.replace(/\.gr$/, ".gr.wasm"), options, program);
     }
   });
 
@@ -209,13 +189,13 @@ program
   .command("compile <file>")
   .description("compile a grain program into wasm")
   .forwardOption("-o <filename>", "output filename")
+  .forwardOption("--no-link", "disable static linking")
   .action(exec.grainc);
 
 program
   .command("run <file>")
-  .description("run a wasm file with grain's javascript runner")
-  .addOption(new commander.Option("-p, --print-output").hideHelp())
-  .action(run);
+  .description("run a wasm file via grain's WASI runner")
+  .action(exec.grainrun);
 
 program
   .command("lsp")

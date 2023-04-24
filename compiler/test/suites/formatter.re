@@ -17,7 +17,7 @@ describe("formatter", ({test, testSkip}) => {
   assertFormatOutput("function_params", "function_params");
   assertFormatOutput("variants", "variants");
   assertFormatOutput("matches", "matches");
-  assertFormatOutput("imports", "imports");
+  assertFormatOutput("includes", "includes");
   assertFormatOutput("wasm", "wasm");
   assertFormatOutput("spreads", "spreads");
   assertFormatOutput("nested_matches", "nested_matches");
@@ -54,4 +54,5 @@ describe("formatter", ({test, testSkip}) => {
   assertFormatOutput("binop_perf", "binop_perf");
   assertFormatOutput("chained", "chained");
   assertFormatOutput("grouped_expr", "grouped_expr");
+  assertFormatOutput("early_return", "early_return");
 });
