@@ -14,7 +14,7 @@ include "runtime/unsafe/errors"
 include "runtime/dataStructures"
 from DataStructures use { allocateInt64, tagSimpleNumber }
 
-export enum Clock {
+provide enum Clock {
   // The clock measuring real time. Time value zero corresponds with
   // 1970-01-01T00:00:00Z.
   Realtime,

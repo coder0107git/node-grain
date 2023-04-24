@@ -28,7 +28,7 @@ provide foreign wasm proc_raise: WasmI32 -> WasmI32 from "wasi_snapshot_preview1
 provide foreign wasm sched_yield: () -> WasmI32 from "wasi_snapshot_preview1"
 
 // events
-import foreign wasm poll_oneoff: (
+provide foreign wasm poll_oneoff: (
   WasmI32,
   WasmI32,
   WasmI32,
@@ -254,7 +254,7 @@ provide let _FDFLAG_RSYNC = 8n
 provide let _FDFLAG_SYNC = 16n
 
 // sublock flags
-let _SUBCLOCK_FLAG_CLOCK_ABSTIME = 1n
+provide let _SUBCLOCK_FLAG_CLOCK_ABSTIME = 1n
 
 // whence
 provide let _WHENCE_SET = 0n

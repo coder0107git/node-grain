@@ -1,31 +1,28 @@
 /**
- * @module Event: Subscriptions to events.
+ * Subscriptions to events.
  *
- * @example import Event from "sys/event"
+ * @example include "sys/event"
  */
 
-import WasmI32, {
-  add as (+),
-  mul as (*),
-  or as (|),
-  ltU as (<),
-  eq as (==),
-  ne as (!=),
-} from "runtime/unsafe/wasmi32"
-import WasmI64 from "runtime/unsafe/wasmi64"
-import Memory from "runtime/unsafe/memory"
-import Wasi from "runtime/wasi"
-import Errors from "runtime/unsafe/errors"
-import {
+module Event
+
+include "runtime/unsafe/wasmi32"
+from WasmI32 use { (+), (*), (|), ltU as (<), (==), (!=) }
+include "runtime/unsafe/wasmi64"
+include "runtime/unsafe/memory"
+include "runtime/wasi"
+include "runtime/unsafe/errors"
+include "runtime/dataStructures"
+from DataStructures use {
   newInt32,
   newInt64,
   tagSimpleNumber,
   untagSimpleNumber,
-} from "runtime/dataStructures"
+}
 
-import List from "list"
-import File from "sys/file"
-import Time from "sys/time"
+include "list"
+include "sys/file"
+include "sys/time"
 
 /**
  * @section Types: Types included in the Event module.
@@ -35,12 +32,12 @@ import Time from "sys/time"
  * User-provided value that may be attached to objects that is retained when
  * extracted from the implementation.
  */
-export type Userdata = Int64
+provide type Userdata = Int64
 
 /**
  * Type of a subscription to an event or its occurrence.
  */
-export enum EventType {
+provide enum EventType {
   // The time value of clock `SubscriptionClock.id` has
   // reached timestamp `SubscriptionClock.timeout`.
   Clock,
@@ -56,7 +53,7 @@ export enum EventType {
  * The state of the file descriptor subscribed to with
  * `EventType.FdRead` or `EventType.FdWrite`.
  */
-export enum EventRWFlags {
+provide enum EventRWFlags {
   // The peer of this socket has closed or disconnected.
   FdReadWriteHangup,
 }
@@ -65,7 +62,7 @@ export enum EventRWFlags {
  * The contents of an `event` when type is `EventType.FdRead` or
  * `EventType.FdWrite`.
  */
-export record EventFdReadWrite {
+provide record EventFdReadWrite {
   // The number of bytes available for reading or writing.
   nbytes: Int64,
   // The state of the file descriptor.
@@ -75,7 +72,7 @@ export record EventFdReadWrite {
 /**
  * An event that occurred.
  */
-export record Event {
+provide record Event {
   // User-provided value that got attached to `subscription::userdata`.
   userdata: Userdata,
   // If non-zero, an error that occurred while processing the subscription request.
@@ -91,7 +88,7 @@ export record Event {
  * Flags determining how to interpret the timestamp provided in
  * `SubscriptionClock.timeout`
  */
-export enum SubClockFlags {
+provide enum SubClockFlags {
   // If set, treat the timestamp provided in
   // `SubscriptionClock.timeout` as an absolute timestamp of clock
   // `SubscriptionClock.id`. If clear, treat the timestamp
@@ -103,7 +100,7 @@ export enum SubClockFlags {
 /**
  * The contents of a `Subscription` when type is `EventType.Clock`.
  */
-export record SubscriptionClock {
+provide record SubscriptionClock {
   // The clock against which to compare the timestamp.
   clock: Time.Clock,
   // The absolute or relative timestamp.
@@ -119,12 +116,12 @@ export record SubscriptionClock {
  * The contents of a `subscription` when type is type is
  * `EventType.FdRead` or `EventType.FdWrite`.
  */
-export record SubscriptionFdReadwrite {
+provide record SubscriptionFdReadwrite {
   // The file descriptor on which to wait for it to become ready for reading or writing.
   fileDescriptor: File.FileDescriptor,
 }
 
-export enum SubscriptionContents {
+provide enum SubscriptionContents {
   SubscriptionClock(SubscriptionClock),
   SubscriptionFdRead(SubscriptionFdReadwrite),
   SubscriptionFdWrite(SubscriptionFdReadwrite),
@@ -133,7 +130,7 @@ export enum SubscriptionContents {
 /**
  * Subscription to an event.
  */
-export record Subscription {
+provide record Subscription {
   // User-provided value that is attached to the subscription in the
   // implementation and returned through `Event.userdata`.
   userdata: Userdata,
@@ -179,7 +176,7 @@ let combineSubClockFlags = subclockFlags => {
  * @returns `Ok(events)` of the events which occured if successful or `Err(Exception)` otherwise
  */
 @unsafe
-export let pollOneoff = subscriptions => {
+provide let pollOneoff = subscriptions => {
   // subscription layout
   /*
 userdata 8
