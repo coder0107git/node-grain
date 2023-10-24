@@ -20,7 +20,7 @@ open Wasm_utils;
 [@deriving (sexp, yojson)]
 type pers_flags =
   | Opaque
- |  Unsafe_string;
+  | Unsafe_string;
 
 type error =
   | Not_an_interface(string)
@@ -102,22 +102,21 @@ let input_cmi = ic =>
   | Result.Error(e) => raise(Invalid_argument(e))
   };
 
-let deserialize_cmi = ic => size => {
+let deserialize_cmi = (ic, size) => {
   let size = ref(size);
-  let lexbuf = Lexing.from_function (buf => n => {
-    let n = min (n, size^);
-    let read = input(ic, buf, 0, n);
-    size := size^ - read;
-    read
-   });
-  let state = Yojson.init_lexer ();
-  switch (
-    cmi_infos_of_yojson @@ Yojson.Safe.from_lexbuf(state, lexbuf)
-  ) {
+  let lexbuf =
+    Lexing.from_function((buf, n) => {
+      let n = min(n, size^);
+      let read = input(ic, buf, 0, n);
+      size := size^ - read;
+      read;
+    });
+  let state = Yojson.init_lexer();
+  switch (cmi_infos_of_yojson @@ Yojson.Safe.from_lexbuf(state, lexbuf)) {
   | Result.Ok(x) => x
   | Result.Error(e) => raise(Invalid_argument(e))
-  }
   };
+};
 
 let serialize_cmi =
     (
