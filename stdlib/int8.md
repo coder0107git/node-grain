@@ -13,6 +13,14 @@ No other changes yet.
 include "int8"
 ```
 
+```grain
+1s
+```
+
+```grain
+-1s
+```
+
 ## Values
 
 Functions and constants included in the Int8 module.
@@ -25,7 +33,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromNumber : (number: Number) -> Int8
+fromNumber : (number: Number) => Int8
 ```
 
 Converts a Number to an Int8.
@@ -50,7 +58,7 @@ No other changes yet.
 </details>
 
 ```grain
-toNumber : (value: Int8) -> Number
+toNumber : (value: Int8) => Number
 ```
 
 Converts an Int8 to a Number.
@@ -75,7 +83,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromUint8 : (x: Uint8) -> Int8
+fromUint8 : (number: Uint8) => Int8
 ```
 
 Converts a Uint8 to an Int8.
@@ -92,6 +100,12 @@ Returns:
 |----|-----------|
 |`Int8`|The Uint8 represented as an Int8|
 
+Examples:
+
+```grain
+Int8.fromUint8(1us) == 1s
+```
+
 ### Int8.**incr**
 
 <details disabled>
@@ -100,7 +114,7 @@ No other changes yet.
 </details>
 
 ```grain
-incr : (value: Int8) -> Int8
+incr : (value: Int8) => Int8
 ```
 
 Increments the value by one.
@@ -117,6 +131,16 @@ Returns:
 |----|-----------|
 |`Int8`|The incremented value|
 
+Examples:
+
+```grain
+Int8.incr(1s) == 2s
+```
+
+```grain
+Int8.incr(-2s) == -1s
+```
+
 ### Int8.**decr**
 
 <details disabled>
@@ -125,7 +149,7 @@ No other changes yet.
 </details>
 
 ```grain
-decr : (value: Int8) -> Int8
+decr : (value: Int8) => Int8
 ```
 
 Decrements the value by one.
@@ -142,6 +166,16 @@ Returns:
 |----|-----------|
 |`Int8`|The decremented value|
 
+Examples:
+
+```grain
+Int8.decr(2s) == 1s
+```
+
+```grain
+Int8.decr(0s) == -1s
+```
+
 ### Int8.**(+)**
 
 <details disabled>
@@ -150,7 +184,7 @@ No other changes yet.
 </details>
 
 ```grain
-(+) : (x: Int8, y: Int8) -> Int8
+(+) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the sum of its operands.
@@ -168,6 +202,13 @@ Returns:
 |----|-----------|
 |`Int8`|The sum of the two operands|
 
+Examples:
+
+```grain
+from Int8 use { (+) }
+assert 1s + 1s == 2s
+```
+
 ### Int8.**(-)**
 
 <details disabled>
@@ -176,7 +217,7 @@ No other changes yet.
 </details>
 
 ```grain
-(-) : (x: Int8, y: Int8) -> Int8
+(-) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the difference of its operands.
@@ -194,6 +235,13 @@ Returns:
 |----|-----------|
 |`Int8`|The difference of the two operands|
 
+Examples:
+
+```grain
+from Int8 use { (-) }
+assert 2s - 1s == 1s
+```
+
 ### Int8.**(*)**
 
 <details disabled>
@@ -202,7 +250,7 @@ No other changes yet.
 </details>
 
 ```grain
-(*) : (x: Int8, y: Int8) -> Int8
+(*) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the product of its operands.
@@ -220,6 +268,13 @@ Returns:
 |----|-----------|
 |`Int8`|The product of the two operands|
 
+Examples:
+
+```grain
+from Int8 use { (*) }
+assert 2s * 2s == 4s
+```
+
 ### Int8.**(/)**
 
 <details disabled>
@@ -228,7 +283,7 @@ No other changes yet.
 </details>
 
 ```grain
-(/) : (x: Int8, y: Int8) -> Int8
+(/) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the quotient of its operands using signed division.
@@ -246,6 +301,13 @@ Returns:
 |----|-----------|
 |`Int8`|The quotient of its operands|
 
+Examples:
+
+```grain
+from Int8 use { (/) }
+assert 8s / 2s == 4s
+```
+
 ### Int8.**rem**
 
 <details disabled>
@@ -254,7 +316,7 @@ No other changes yet.
 </details>
 
 ```grain
-rem : (x: Int8, y: Int8) -> Int8
+rem : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the remainder of the division of its operands using signed division.
@@ -272,6 +334,12 @@ Returns:
 |----|-----------|
 |`Int8`|The remainder of its operands|
 
+Examples:
+
+```grain
+Int8.rem(8s, 3s) == 2s
+```
+
 ### Int8.**(%)**
 
 <details disabled>
@@ -280,7 +348,7 @@ No other changes yet.
 </details>
 
 ```grain
-(%) : (x: Int8, y: Int8) -> Int8
+(%) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the remainder of the division of the first operand by the second.
@@ -305,6 +373,13 @@ Throws:
 
 * When `y` is zero
 
+Examples:
+
+```grain
+from Int8 use { (%) }
+assert -5s % 3s == 1s
+```
+
 ### Int8.**(<<)**
 
 <details disabled>
@@ -313,7 +388,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<<) : (value: Int8, amount: Int8) -> Int8
+(<<) : (value: Int8, amount: Int8) => Int8
 ```
 
 Shifts the bits of the value left by the given number of bits.
@@ -331,6 +406,13 @@ Returns:
 |----|-----------|
 |`Int8`|The shifted value|
 
+Examples:
+
+```grain
+from Int8 use { (<<) }
+assert (5s << 1s) == 10s
+```
+
 ### Int8.**(>>)**
 
 <details disabled>
@@ -339,7 +421,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>>) : (value: Int8, amount: Int8) -> Int8
+(>>) : (value: Int8, amount: Int8) => Int8
 ```
 
 Shifts the bits of the value right by the given number of bits, preserving the sign bit.
@@ -357,6 +439,13 @@ Returns:
 |----|-----------|
 |`Int8`|The shifted value|
 
+Examples:
+
+```grain
+from Int8 use { (>>) }
+assert (5s >> 1s) == 2s
+```
+
 ### Int8.**(==)**
 
 <details disabled>
@@ -365,7 +454,7 @@ No other changes yet.
 </details>
 
 ```grain
-(==) : (x: Int8, y: Int8) -> Bool
+(==) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is equal to the second value.
@@ -383,6 +472,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (==) }
+assert 1s == 1s
+```
+
 ### Int8.**(!=)**
 
 <details disabled>
@@ -391,7 +487,7 @@ No other changes yet.
 </details>
 
 ```grain
-(!=) : (x: Int8, y: Int8) -> Bool
+(!=) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is not equal to the second value.
@@ -409,6 +505,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is not equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (!=) }
+assert 1s != 2s
+```
+
 ### Int8.**(<)**
 
 <details disabled>
@@ -417,7 +520,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<) : (x: Int8, y: Int8) -> Bool
+(<) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is less than the second value.
@@ -435,6 +538,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (<) }
+assert 1s < 2s
+```
+
 ### Int8.**(>)**
 
 <details disabled>
@@ -443,7 +553,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>) : (x: Int8, y: Int8) -> Bool
+(>) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is greater than the second value.
@@ -461,6 +571,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is greater than the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (>) }
+assert 2s > 1s
+```
+
 ### Int8.**(<=)**
 
 <details disabled>
@@ -469,7 +586,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<=) : (x: Int8, y: Int8) -> Bool
+(<=) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is less than or equal to the second value.
@@ -487,6 +604,18 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than or equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (<=) }
+assert 1s <= 2s
+```
+
+```grain
+from Int8 use { (<=) }
+assert 1s <= 1s
+```
+
 ### Int8.**(>=)**
 
 <details disabled>
@@ -495,7 +624,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>=) : (x: Int8, y: Int8) -> Bool
+(>=) : (x: Int8, y: Int8) => Bool
 ```
 
 Checks if the first value is greater than or equal to the second value.
@@ -513,6 +642,18 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is greater than or equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Int8 use { (>=) }
+assert 2s >= 1s
+```
+
+```grain
+from Int8 use { (>=) }
+assert 1s >= 1s
+```
+
 ### Int8.**lnot**
 
 <details disabled>
@@ -521,7 +662,7 @@ No other changes yet.
 </details>
 
 ```grain
-lnot : (value: Int8) -> Int8
+lnot : (value: Int8) => Int8
 ```
 
 Computes the bitwise NOT of the given value.
@@ -538,6 +679,12 @@ Returns:
 |----|-----------|
 |`Int8`|Containing the inverted bits of the given value|
 
+Examples:
+
+```grain
+Int.lnot(-5s) == 4s
+```
+
 ### Int8.**(&)**
 
 <details disabled>
@@ -546,7 +693,7 @@ No other changes yet.
 </details>
 
 ```grain
-(&) : (x: Int8, y: Int8) -> Int8
+(&) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the bitwise AND (`&`) on the given operands.
@@ -564,6 +711,13 @@ Returns:
 |----|-----------|
 |`Int8`|Containing a `1` in each bit position for which the corresponding bits of both operands are `1`|
 
+Examples:
+
+```grain
+from Int8 use { (&) }
+assert (3s & 4s) == 0s
+```
+
 ### Int8.**(|)**
 
 <details disabled>
@@ -572,7 +726,7 @@ No other changes yet.
 </details>
 
 ```grain
-(|) : (x: Int8, y: Int8) -> Int8
+(|) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the bitwise OR (`|`) on the given operands.
@@ -590,6 +744,13 @@ Returns:
 |----|-----------|
 |`Int8`|Containing a `1` in each bit position for which the corresponding bits of either or both operands are `1`|
 
+Examples:
+
+```grain
+from Int8 use { (|) }
+assert (3s | 4s) == 7s
+```
+
 ### Int8.**(^)**
 
 <details disabled>
@@ -598,7 +759,7 @@ No other changes yet.
 </details>
 
 ```grain
-(^) : (x: Int8, y: Int8) -> Int8
+(^) : (x: Int8, y: Int8) => Int8
 ```
 
 Computes the bitwise XOR (`^`) on the given operands.
@@ -615,4 +776,11 @@ Returns:
 |type|description|
 |----|-----------|
 |`Int8`|Containing a `1` in each bit position for which the corresponding bits of either but not both operands are `1`|
+
+Examples:
+
+```grain
+from Int8 use { (^) }
+assert (3s ^ 5s) == 6s
+```
 

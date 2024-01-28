@@ -23,8 +23,6 @@ include "runtime/numbers"
 from Numbers use { coerceNumberToWasmI32 }
 
 @unsafe
-let mut _ARRAY_LENGTH_OFFSET = 4n
-@unsafe
 let mut _ARRAY_START_OFFSET = 8n
 
 @unsafe
@@ -62,10 +60,7 @@ let wrapNegativeIndex = (arrLen, idx) => {
  * @since v0.1.0
  */
 @unsafe
-provide let length = array => {
-  let ptr = WasmI32.fromGrain(array: Array<a>)
-  tagSimpleNumber(WasmI32.load(ptr, _ARRAY_LENGTH_OFFSET))
-}
+provide primitive length = "@array.length"
 
 /**
  * Creates a new array of the specified length with each element being
@@ -83,9 +78,8 @@ provide let length = array => {
  * @since v0.1.0
  */
 @unsafe
-provide let make: (Number, a) -> Array<a> = (length: Number, item: a) => {
+provide let make = (length: Number, item: a) => {
   from WasmI32 use { (+), (*), (<) }
-  let lengthArg = length
   checkLength(length)
   let length = coerceNumberToWasmI32(length)
   let byteLength = length * 4n
@@ -117,11 +111,7 @@ provide let make: (Number, a) -> Array<a> = (length: Number, item: a) => {
  * @since v0.1.0
  */
 @unsafe
-provide let init: (Number, Number -> a) -> Array<a> =
-  (
-    length: Number,
-    fn: Number -> a,
-  ) => {
+provide let init = (length: Number, fn: Number => a) => {
   from WasmI32 use { (+), (*), (<) }
   checkLength(length)
   let length = coerceNumberToWasmI32(length)
@@ -464,7 +454,7 @@ provide let flatMap = (fn, array) => {
  *
  * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
  * @param array: The array to check
- * @returns `true` if all elements satify the condition or `false` otherwise
+ * @returns `true` if all elements satisfy the condition or `false` otherwise
  *
  * @since v0.3.0
  */
@@ -483,7 +473,7 @@ provide let every = (fn, array) => {
  *
  * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
  * @param array: The array to iterate
- * @returns `true` if one or more elements satify the condition or `false` otherwise
+ * @returns `true` if one or more elements satisfy the condition or `false` otherwise
  *
  * @since v0.3.0
  */
@@ -537,14 +527,10 @@ provide let fillRange = (value, start, stop, array) => {
     stopIndex
   }
 
-  if (startIndex > length) {
-    throw IndexOutOfBounds
-  }
-  if (startIndex > stopIndex) {
+  if (startIndex > length || startIndex > stopIndex) {
     throw IndexOutOfBounds
   }
 
-  let mut index = startIndex
   for (let mut index = startIndex; index < stopIndex; index += 1) {
     array[index] = value
   }
@@ -636,7 +622,7 @@ provide let contains = (search, array) => {
 }
 
 /**
- * Finds the first element in an array that satifies the given condition.
+ * Finds the first element in an array that satisfies the given condition.
  *
  * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
  * @param array: The array to search
@@ -655,7 +641,7 @@ provide let find = (fn, array) => {
 }
 
 /**
- * Finds the first index in an array where the element satifies the given condition.
+ * Finds the first index in an array where the element satisfies the given condition.
  *
  * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
  * @param array: The array to search
@@ -889,17 +875,30 @@ provide let unzip = array => {
  *
  * @since v0.4.0
  */
+@unsafe
 provide let join = (separator: String, items: Array<String>) => {
-  let iter = (acc, str) => {
-    match (acc) {
-      None => Some(str),
-      Some(prev) => Some(prev ++ separator ++ str),
-    }
+  from WasmI32 use { (+), (==) }
+  from DataStructures use { allocateString, stringSize }
+  let arrLen = length(items)
+  let sepPtr = WasmI32.fromGrain(separator)
+  let sepSize = stringSize(sepPtr)
+  let sepPtr = sepPtr + 8n
+  let mut strSize = 0n
+  for (let mut i = 0; i < arrLen; i = incr(i)) {
+    strSize += stringSize(WasmI32.fromGrain(items[i]))
+    if (i != 0) strSize += sepSize
   }
-  match (reduce(iter, None, items)) {
-    None => "",
-    Some(s) => s,
+  let newString = allocateString(strSize)
+  let mut offset = newString + 8n
+  for (let mut i = 0; i < arrLen; i = incr(i)) {
+    let ptr = WasmI32.fromGrain(items[i])
+    let size = stringSize(ptr)
+    Memory.copy(offset, ptr + 8n, size)
+    offset += size
+    if (i != arrLen) Memory.copy(offset, sepPtr, sepSize)
+    offset += sepSize
   }
+  WasmI32.toGrain(newString): String
 }
 
 /**
@@ -1121,8 +1120,8 @@ provide module Immutable {
   // To be applied to numbers to bring them within the range [0, 32)
   let bitmask = branchingFactor - 1
 
-  type Tree<a> = Array<Node<a>>,
-  enum Node<a> {
+  type rec Tree<a> = Array<Node<a>>
+  and enum Node<a> {
     Tree(Tree<a>),
     Leaf(Array<a>),
   }
@@ -1813,12 +1812,12 @@ provide module Immutable {
    * @history v0.5.4: Originally in `"immutablearray"` module
    */
 
-  provide let contains = (value, array) => {
-    reduce((acc, x) => acc || x == value, false, array)
+  provide let contains = (search, array) => {
+    reduce((acc, x) => acc || x == search, false, array)
   }
 
   /**
-   * Finds the first element in an array that satifies the given condition.
+   * Finds the first element in an array that satisfies the given condition.
    *
    * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
    * @param array: The array to search
@@ -1833,7 +1832,7 @@ provide module Immutable {
   }
 
   /**
-   * Finds the first index in an array where the element satifies the given condition.
+   * Finds the first index in an array where the element satisfies the given condition.
    *
    * @param fn: The function to call on each element, where the returned value indicates if the element satisfies the condition
    * @param array: The array to search

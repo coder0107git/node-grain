@@ -13,6 +13,14 @@ No other changes yet.
 include "rational"
 ```
 
+```grain
+1/2r
+```
+
+```grain
+3/4r
+```
+
 ## Values
 
 Functions and constants included in the Rational module.
@@ -25,7 +33,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromNumber : (x: Number) -> Rational
+fromNumber : (number: Number) => Rational
 ```
 
 Converts a Number to a Rational.
@@ -50,7 +58,7 @@ No other changes yet.
 </details>
 
 ```grain
-toNumber : (x: Rational) -> Number
+toNumber : (rational: Rational) => Number
 ```
 
 Converts a Rational to a Number.
@@ -75,7 +83,7 @@ No other changes yet.
 </details>
 
 ```grain
-numerator : (x: Rational) -> Number
+numerator : (x: Rational) => Number
 ```
 
 Finds the numerator of the rational number.
@@ -100,7 +108,7 @@ No other changes yet.
 </details>
 
 ```grain
-denominator : (x: Rational) -> Number
+denominator : (x: Rational) => Number
 ```
 
 Finds the denominator of the rational number.
@@ -125,7 +133,7 @@ No other changes yet.
 </details>
 
 ```grain
-toIntegerRatio : (x: Rational) -> (Number, Number)
+toIntegerRatio : (x: Rational) => (Number, Number)
 ```
 
 Gets the numerator and denominator of the rational.
@@ -142,6 +150,16 @@ Returns:
 |----|-----------|
 |`(Number, Number)`|The numerator and denominator of the rational|
 
+Examples:
+
+```grain
+Rational.toIntegerRatio(1/2r) == (1, 2)
+```
+
+```grain
+Rational.toIntegerRatio(2/8r) == (1, 4)
+```
+
 ### Rational.**fromIntegerRatio**
 
 <details disabled>
@@ -150,7 +168,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromIntegerRatio : (numerator: Number, denominator: Number) -> Rational
+fromIntegerRatio : (numerator: Number, denominator: Number) => Rational
 ```
 
 Creates a rational from a numerator and denominator.
@@ -175,6 +193,16 @@ Throws:
 * If the numerator is not an integer
 * If the denominator is not an integer
 
+Examples:
+
+```grain
+Rational.fromIntegerRatio(1, 2) == 1/2r
+```
+
+```grain
+Rational.fromIntegerRatio(2, 8) == 1/4r
+```
+
 ### Rational.**(+)**
 
 <details disabled>
@@ -183,7 +211,7 @@ No other changes yet.
 </details>
 
 ```grain
-(+) : (x: Rational, y: Rational) -> Rational
+(+) : (x: Rational, y: Rational) => Rational
 ```
 
 Computes the sum of its operands.
@@ -201,6 +229,13 @@ Returns:
 |----|-----------|
 |`Rational`|The sum of the two operands|
 
+Examples:
+
+```grain
+from Rational use { (+) }
+assert 1/2r + 1/4r == 3/4r
+```
+
 ### Rational.**(-)**
 
 <details disabled>
@@ -209,7 +244,7 @@ No other changes yet.
 </details>
 
 ```grain
-(-) : (x: Rational, y: Rational) -> Rational
+(-) : (x: Rational, y: Rational) => Rational
 ```
 
 Computes the difference of its operands.
@@ -227,6 +262,13 @@ Returns:
 |----|-----------|
 |`Rational`|The difference of the two operands|
 
+Examples:
+
+```grain
+from Rational use { (-) }
+assert 1/2r - 1/4r == 1/4r
+```
+
 ### Rational.**(*)**
 
 <details disabled>
@@ -235,7 +277,7 @@ No other changes yet.
 </details>
 
 ```grain
-(*) : (x: Rational, y: Rational) -> Rational
+(*) : (x: Rational, y: Rational) => Rational
 ```
 
 Computes the product of its operands.
@@ -253,6 +295,13 @@ Returns:
 |----|-----------|
 |`Rational`|The product of the two operands|
 
+Examples:
+
+```grain
+from Rational use { (*) }
+assert 1/2r * 1/4r == 1/8r
+```
+
 ### Rational.**(/)**
 
 <details disabled>
@@ -261,7 +310,7 @@ No other changes yet.
 </details>
 
 ```grain
-(/) : (x: Rational, y: Rational) -> Rational
+(/) : (x: Rational, y: Rational) => Rational
 ```
 
 Computes the quotient of its operands.
@@ -279,6 +328,13 @@ Returns:
 |----|-----------|
 |`Rational`|The quotient of the two operands|
 
+Examples:
+
+```grain
+from Rational use { (/) }
+assert 1/2r / 1/4r == 2/1r
+```
+
 ### Rational.**(==)**
 
 <details disabled>
@@ -287,7 +343,7 @@ No other changes yet.
 </details>
 
 ```grain
-(==) : (x: Rational, y: Rational) -> Bool
+(==) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is equal to the second value.
@@ -305,6 +361,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Rational use { (==) }
+assert 1/2r == 1/2r
+```
+
 ### Rational.**(!=)**
 
 <details disabled>
@@ -313,7 +376,7 @@ No other changes yet.
 </details>
 
 ```grain
-(!=) : (x: Rational, y: Rational) -> Bool
+(!=) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is not equal to the second value.
@@ -331,6 +394,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is not equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Rational use { (!=) }
+assert 1/2r != 1/4r
+```
+
 ### Rational.**(<)**
 
 <details disabled>
@@ -339,7 +409,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<) : (x: Rational, y: Rational) -> Bool
+(<) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is less than the second value.
@@ -357,6 +427,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Rational use { (<) }
+assert 1/4r < 1/2r
+```
+
 ### Rational.**(>)**
 
 <details disabled>
@@ -365,7 +442,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>) : (x: Rational, y: Rational) -> Bool
+(>) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is greater than the second value.
@@ -383,6 +460,13 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is greater than the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Rational use { (>) }
+assert 1/2r > 1/4r
+```
+
 ### Rational.**(<=)**
 
 <details disabled>
@@ -391,7 +475,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<=) : (x: Rational, y: Rational) -> Bool
+(<=) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is less than or equal to the second value.
@@ -409,6 +493,18 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than or equal to the second value or `false` otherwise|
 
+Examples:
+
+```grain
+from Rational use { (<=) }
+assert 1/4r <= 1/2r
+```
+
+```grain
+from Rational use { (<=) }
+assert 1/2r <= 1/2r
+```
+
 ### Rational.**(>=)**
 
 <details disabled>
@@ -417,7 +513,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>=) : (x: Rational, y: Rational) -> Bool
+(>=) : (x: Rational, y: Rational) => Bool
 ```
 
 Checks if the first value is greater than or equal to the second value.
@@ -434,4 +530,16 @@ Returns:
 |type|description|
 |----|-----------|
 |`Bool`|`true` if the first value is greater than or equal to the second value or `false` otherwise|
+
+Examples:
+
+```grain
+from Rational use { (>=) }
+assert 1/2r >= 1/4r
+```
+
+```grain
+from Rational use { (>=) }
+assert 1/2r >= 1/2r
+```
 

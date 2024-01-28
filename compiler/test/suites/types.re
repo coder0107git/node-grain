@@ -202,7 +202,7 @@ describe("aliased types", ({test, testSkip}) => {
   assertRun(
     "regression_annotated_type_func_1",
     {|
-      abstract type AddPrinter = (Number, Number) -> Void
+      abstract type AddPrinter = (Number, Number) => Void
       provide let add: AddPrinter = (x, y) => print(x + y)
       add(4, 4)
     |},
@@ -211,7 +211,7 @@ describe("aliased types", ({test, testSkip}) => {
   assertRun(
     "regression_annotated_type_func_2",
     {|
-      abstract type AddPrinter<a> = (a, a) -> Void
+      abstract type AddPrinter<a> = (a, a) => Void
       provide let add: AddPrinter<Number> = (x, y) => print(x + y)
       add(4, 4)
     |},
@@ -364,5 +364,167 @@ describe("abstract types", ({test, testSkip}) => {
       print(A.function())
     |},
     "abc\n",
+  );
+});
+
+describe("recursive types", ({test, testSkip}) => {
+  let test_or_skip =
+    Sys.backend_type == Other("js_of_ocaml") ? testSkip : test;
+
+  let assertCompileError = makeCompileErrorRunner(test);
+  let assertRun = makeRunner(test_or_skip);
+
+  assertCompileError(
+    "type_rec_incorrect_1",
+    {|
+      record Oops {
+        x: Oops
+      }
+    |},
+    "Unbound type constructor Oops. Are you missing the `rec` keyword on this type?",
+  );
+  assertCompileError(
+    "type_rec_incorrect_2",
+    {|
+      record T {
+        x: Number
+      }
+      and enum T2 {
+        T2(Number)
+      }
+    |},
+    "Mutually recursive type groups must include `rec` on the first type in the group.",
+  );
+  assertCompileError(
+    "type_rec_incorrect_3",
+    {|
+      record rec T {
+        x: Number
+      }
+      and enum rec T2 {
+        T2(Number)
+      }
+    |},
+    "The `rec` keyword should only appear on the first type in the mutually recursive type group.",
+  );
+  assertRun(
+    "type_rec_correct_1",
+    {|
+      record rec T {
+        x: T
+      }
+      and enum T2 {
+        T2(T2),
+        Val(Number)
+      }
+      print(T2(T2(Val(1))))
+    |},
+    "T2(T2(Val(1)))\n",
+  );
+  assertRun(
+    "type_rec_correct_2",
+    {|
+      record T {
+        x: Number
+      }
+      type T = T
+      print({ x: 1 }: T)
+    |},
+    "{\n  x: 1\n}\n",
+  );
+});
+
+describe("function types", ({test, testSkip}) => {
+  let test_or_skip =
+    Sys.backend_type == Other("js_of_ocaml") ? testSkip : test;
+
+  let assertCompileError = makeCompileErrorRunner(test);
+  let assertRun = makeRunner(test_or_skip);
+
+  assertRun(
+    "type_fn_1",
+    {|
+      type Foo = Number => String
+      let f: Foo = num => "a"
+      print(f(1))
+    |},
+    "a\n",
+  );
+  assertRun(
+    "type_fn_2",
+    {|
+      type Foo = (Number, Number) => Number
+      let f: Foo = (a, b) => a + b
+      print(f(1, 2))
+    |},
+    "3\n",
+  );
+  assertRun(
+    "type_fn_3",
+    {|
+      type Foo<a> = a => a
+      let f: Foo<Number> = a => a
+      print(f(1))
+    |},
+    "1\n",
+  );
+  assertRun(
+    "type_fn_4",
+    {|
+      include "map"
+      type Foo = Map.Map<List<Number>, Map.Map<Number, Number>> => Map.Map<Number, Number>
+      let f: Foo = a => Map.make()
+      print(f(Map.make()) == Map.make())
+    |},
+    "true\n",
+  );
+  assertRun(
+    "type_fn_5",
+    {|
+      include "map"
+      type Foo = Map.Map<Number, Number> => Map.Map<Number, Number> => Number
+      let f: Foo = a => b => 1
+      print(f(Map.make())(Map.make()))
+    |},
+    "1\n",
+  );
+  assertRun(
+    "type_fn_6",
+    {|
+      let f: List<Number> => List<Number> => Number = a => b => 1
+      print(f([])([]))
+    |},
+    "1\n",
+  );
+  assertCompileError(
+    "type_fn_6",
+    {|
+      let badIdentity: x => x
+      print(badIdentity(1))
+    |},
+    "Syntax error after 'x' and before ' '.\nExpected a type annotation or `=`.",
+  );
+  assertCompileError(
+    "type_fn_7",
+    {|
+      let badFn: Number =>
+    |},
+    "Syntax error after ' ' and before ''.\nExpected a type for the result of the function type.",
+  );
+  assertCompileError(
+    "type_fn_8",
+    {|
+      let badFn: Number =>
+      print(badFn(1))
+    |},
+    "Syntax error after 'print' and before '\\('.\nExpected a type annotation or `=`.",
+  );
+  assertCompileError(
+    "type_fn_9",
+    {|
+      let badFn: (Number => )
+      print(badFn(1))
+    |},
+    "Syntax error after '=>' and before '\\)'.\nExpected a type for the result of the function type.",
   );
 });

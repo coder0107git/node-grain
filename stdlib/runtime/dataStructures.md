@@ -9,7 +9,7 @@ Functions and constants included in the DataStructures module.
 ### DataStructures.**allocateArray**
 
 ```grain
-allocateArray : WasmI32 -> WasmI32
+allocateArray : WasmI32 => WasmI32
 ```
 
 Allocates a new Grain array.
@@ -18,7 +18,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`numElts`|`WasmI32`|The number of elements to be contained in this array|
+|`0`|`WasmI32`|The number of elements to be contained in this array|
 
 Returns:
 
@@ -29,7 +29,7 @@ Returns:
 ### DataStructures.**allocateTuple**
 
 ```grain
-allocateTuple : WasmI32 -> WasmI32
+allocateTuple : WasmI32 => WasmI32
 ```
 
 Allocates a new Grain tuple.
@@ -38,7 +38,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`numElts`|`WasmI32`|The number of elements to be contained in this tuple|
+|`0`|`WasmI32`|The number of elements to be contained in this tuple|
 
 Returns:
 
@@ -49,7 +49,7 @@ Returns:
 ### DataStructures.**allocateBytes**
 
 ```grain
-allocateBytes : WasmI32 -> WasmI32
+allocateBytes : WasmI32 => WasmI32
 ```
 
 Allocates a new Grain bytes.
@@ -58,7 +58,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`size`|`WasmI32`|The number of bytes to be contained in this buffer|
+|`0`|`WasmI32`|The number of bytes to be contained in this buffer|
 
 Returns:
 
@@ -69,7 +69,7 @@ Returns:
 ### DataStructures.**allocateString**
 
 ```grain
-allocateString : WasmI32 -> WasmI32
+allocateString : WasmI32 => WasmI32
 ```
 
 Allocates a new Grain string.
@@ -78,7 +78,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`size`|`WasmI32`|The size (in bytes) of the string to allocate|
+|`0`|`WasmI32`|The size (in bytes) of the string to allocate|
 
 Returns:
 
@@ -89,7 +89,7 @@ Returns:
 ### DataStructures.**allocateInt32**
 
 ```grain
-allocateInt32 : () -> WasmI32
+allocateInt32 : () => WasmI32
 ```
 
 Allocates a new Int32.
@@ -103,7 +103,7 @@ Returns:
 ### DataStructures.**newInt32**
 
 ```grain
-newInt32 : WasmI32 -> WasmI32
+newInt32 : WasmI32 => WasmI32
 ```
 
 Allocates a new Int32 with a prepopulated value
@@ -112,7 +112,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmI32`|The value to store|
+|`0`|`WasmI32`|The value to store|
 
 Returns:
 
@@ -123,7 +123,7 @@ Returns:
 ### DataStructures.**allocateUint32**
 
 ```grain
-allocateUint32 : () -> WasmI32
+allocateUint32 : () => WasmI32
 ```
 
 Allocates a new Uint32.
@@ -137,7 +137,7 @@ Returns:
 ### DataStructures.**newUint32**
 
 ```grain
-newUint32 : WasmI32 -> WasmI32
+newUint32 : WasmI32 => WasmI32
 ```
 
 Allocates a new Uint32 with a prepopulated value
@@ -146,7 +146,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmI32`|The value to store|
+|`0`|`WasmI32`|The value to store|
 
 Returns:
 
@@ -157,7 +157,7 @@ Returns:
 ### DataStructures.**allocateInt64**
 
 ```grain
-allocateInt64 : () -> WasmI32
+allocateInt64 : () => WasmI32
 ```
 
 Allocates a new Int64.
@@ -171,7 +171,7 @@ Returns:
 ### DataStructures.**newInt64**
 
 ```grain
-newInt64 : WasmI64 -> WasmI32
+newInt64 : WasmI64 => WasmI32
 ```
 
 Allocates a new Int64 with a prepopulated value
@@ -180,7 +180,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmI64`|The value to store|
+|`0`|`WasmI64`|The value to store|
 
 Returns:
 
@@ -191,7 +191,7 @@ Returns:
 ### DataStructures.**allocateUint64**
 
 ```grain
-allocateUint64 : () -> WasmI32
+allocateUint64 : () => WasmI32
 ```
 
 Allocates a new Uint64.
@@ -205,7 +205,7 @@ Returns:
 ### DataStructures.**newUint64**
 
 ```grain
-newUint64 : WasmI64 -> WasmI32
+newUint64 : WasmI64 => WasmI32
 ```
 
 Allocates a new Uint64 with a prepopulated value
@@ -214,7 +214,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmI64`|The value to store|
+|`0`|`WasmI64`|The value to store|
 
 Returns:
 
@@ -225,7 +225,7 @@ Returns:
 ### DataStructures.**allocateFloat32**
 
 ```grain
-allocateFloat32 : () -> WasmI32
+allocateFloat32 : () => WasmI32
 ```
 
 Allocates a new Float32.
@@ -239,7 +239,7 @@ Returns:
 ### DataStructures.**newFloat32**
 
 ```grain
-newFloat32 : WasmF32 -> WasmI32
+newFloat32 : WasmF32 => WasmI32
 ```
 
 Allocates a new Float32 with a prepopulated value
@@ -248,7 +248,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmF32`|The value to store|
+|`0`|`WasmF32`|The value to store|
 
 Returns:
 
@@ -259,7 +259,7 @@ Returns:
 ### DataStructures.**allocateFloat64**
 
 ```grain
-allocateFloat64 : () -> WasmI32
+allocateFloat64 : () => WasmI32
 ```
 
 Allocates a new Float64.
@@ -273,7 +273,7 @@ Returns:
 ### DataStructures.**newFloat64**
 
 ```grain
-newFloat64 : WasmF64 -> WasmI32
+newFloat64 : WasmF64 => WasmI32
 ```
 
 Allocates a new Float64 with a prepopulated value
@@ -282,7 +282,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmF64`|The value to store|
+|`0`|`WasmF64`|The value to store|
 
 Returns:
 
@@ -293,7 +293,7 @@ Returns:
 ### DataStructures.**allocateRational**
 
 ```grain
-allocateRational : () -> WasmI32
+allocateRational : () => WasmI32
 ```
 
 Allocates a new Rational.
@@ -307,7 +307,7 @@ Returns:
 ### DataStructures.**newRational**
 
 ```grain
-newRational : (WasmI32, WasmI32) -> WasmI32
+newRational : (WasmI32, WasmI32) => WasmI32
 ```
 
 Allocates a new Rational with a prepopulated value
@@ -316,8 +316,8 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`WasmI32`|The numerator value to store|
-|`value`|`WasmI32`|The denominator value to store|
+|`0`|`WasmI32`|The numerator value to store|
+|`1`|`WasmI32`|The denominator value to store|
 
 Returns:
 
@@ -328,7 +328,7 @@ Returns:
 ### DataStructures.**loadAdtVariant**
 
 ```grain
-loadAdtVariant : WasmI32 -> WasmI32
+loadAdtVariant : WasmI32 => WasmI32
 ```
 
 Load the (tagged) variant of an ADT.
@@ -337,7 +337,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`ptr`|`WasmI32`|Untagged pointer to the ADT|
+|`0`|`WasmI32`|Untagged pointer to the ADT|
 
 Returns:
 
@@ -348,7 +348,7 @@ Returns:
 ### DataStructures.**stringSize**
 
 ```grain
-stringSize : WasmI32 -> WasmI32
+stringSize : WasmI32 => WasmI32
 ```
 
 Load an untagged string's size.
@@ -357,7 +357,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`ptr`|`WasmI32`|Untagged pointer to the string|
+|`0`|`WasmI32`|Untagged pointer to the string|
 
 Returns:
 
@@ -368,7 +368,7 @@ Returns:
 ### DataStructures.**bytesSize**
 
 ```grain
-bytesSize : WasmI32 -> WasmI32
+bytesSize : WasmI32 => WasmI32
 ```
 
 Load an untagged Bytes' size.
@@ -377,7 +377,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`ptr`|`WasmI32`|Untagged pointer to the Bytes|
+|`0`|`WasmI32`|Untagged pointer to the Bytes|
 
 Returns:
 
@@ -388,7 +388,7 @@ Returns:
 ### DataStructures.**tagSimpleNumber**
 
 ```grain
-tagSimpleNumber : WasmI32 -> Number
+tagSimpleNumber : WasmI32 => Number
 ```
 
 Tag a simple number.
@@ -397,7 +397,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The number to tag|
+|`0`|`WasmI32`|The number to tag|
 
 Returns:
 
@@ -408,7 +408,7 @@ Returns:
 ### DataStructures.**untagSimpleNumber**
 
 ```grain
-untagSimpleNumber : Number -> WasmI32
+untagSimpleNumber : Number => WasmI32
 ```
 
 Untag a simple number.
@@ -417,7 +417,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Number`|The number to untag|
+|`0`|`Number`|The number to untag|
 
 Returns:
 
@@ -428,7 +428,7 @@ Returns:
 ### DataStructures.**tagChar**
 
 ```grain
-tagChar : WasmI32 -> Char
+tagChar : WasmI32 => Char
 ```
 
 Tag a char.
@@ -437,7 +437,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The usv to tag|
+|`0`|`WasmI32`|The usv to tag|
 
 Returns:
 
@@ -448,7 +448,7 @@ Returns:
 ### DataStructures.**untagChar**
 
 ```grain
-untagChar : Char -> WasmI32
+untagChar : Char => WasmI32
 ```
 
 Untag a char.
@@ -457,7 +457,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Char`|The char to untag|
+|`0`|`Char`|The char to untag|
 
 Returns:
 
@@ -468,7 +468,7 @@ Returns:
 ### DataStructures.**tagInt8**
 
 ```grain
-tagInt8 : WasmI32 -> Int8
+tagInt8 : WasmI32 => Int8
 ```
 
 Tag an int8.
@@ -477,7 +477,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The int8 to tag|
+|`0`|`WasmI32`|The int8 to tag|
 
 Returns:
 
@@ -488,7 +488,7 @@ Returns:
 ### DataStructures.**untagInt8**
 
 ```grain
-untagInt8 : Int8 -> WasmI32
+untagInt8 : Int8 => WasmI32
 ```
 
 Untag an int8.
@@ -497,7 +497,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Int8`|The int8 to untag|
+|`0`|`Int8`|The int8 to untag|
 
 Returns:
 
@@ -508,7 +508,7 @@ Returns:
 ### DataStructures.**tagInt16**
 
 ```grain
-tagInt16 : WasmI32 -> Int16
+tagInt16 : WasmI32 => Int16
 ```
 
 Tag an int16.
@@ -517,7 +517,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The int16 to tag|
+|`0`|`WasmI32`|The int16 to tag|
 
 Returns:
 
@@ -528,7 +528,7 @@ Returns:
 ### DataStructures.**untagInt16**
 
 ```grain
-untagInt16 : Int16 -> WasmI32
+untagInt16 : Int16 => WasmI32
 ```
 
 Untag an int16.
@@ -537,7 +537,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Int16`|The int16 to untag|
+|`0`|`Int16`|The int16 to untag|
 
 Returns:
 
@@ -548,7 +548,7 @@ Returns:
 ### DataStructures.**tagUint8**
 
 ```grain
-tagUint8 : WasmI32 -> Uint8
+tagUint8 : WasmI32 => Uint8
 ```
 
 Tag a uint8.
@@ -557,7 +557,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The uint8 to tag|
+|`0`|`WasmI32`|The uint8 to tag|
 
 Returns:
 
@@ -568,7 +568,7 @@ Returns:
 ### DataStructures.**untagUint8**
 
 ```grain
-untagUint8 : Uint8 -> WasmI32
+untagUint8 : Uint8 => WasmI32
 ```
 
 Untag a uint8.
@@ -577,7 +577,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Uint8`|The uint8 to untag|
+|`0`|`Uint8`|The uint8 to untag|
 
 Returns:
 
@@ -588,7 +588,7 @@ Returns:
 ### DataStructures.**tagUint16**
 
 ```grain
-tagUint16 : WasmI32 -> Uint16
+tagUint16 : WasmI32 => Uint16
 ```
 
 Tag a uint16.
@@ -597,7 +597,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`WasmI32`|The uint16 to tag|
+|`0`|`WasmI32`|The uint16 to tag|
 
 Returns:
 
@@ -608,7 +608,7 @@ Returns:
 ### DataStructures.**untagUint16**
 
 ```grain
-untagUint16 : Uint16 -> WasmI32
+untagUint16 : Uint16 => WasmI32
 ```
 
 Untag a uint16.
@@ -617,7 +617,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`num`|`Uint16`|The uint16 to untag|
+|`0`|`Uint16`|The uint16 to untag|
 
 Returns:
 

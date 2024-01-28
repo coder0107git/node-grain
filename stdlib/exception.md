@@ -4,7 +4,7 @@ title: Exception
 
 Utilities for working with the Exception type.
 
-The Exception type represents an error that has occured during computation.
+The Exception type represents an error that has occurred during computation.
 
 <details disabled>
 <summary tabindex="-1">Added in <code>0.3.0</code></summary>
@@ -13,6 +13,14 @@ No other changes yet.
 
 ```grain
 include "exception"
+```
+
+```grain
+exception ExampleError(Number)
+```
+
+```grain
+exception ExampleError
 ```
 
 ## Values
@@ -27,7 +35,7 @@ No other changes yet.
 </details>
 
 ```grain
-registerPrinter : (printer: (Exception -> Option<String>)) -> Void
+registerPrinter : (printer: (Exception => Option<String>)) => Void
 ```
 
 Registers an exception printer. When an exception is thrown, all registered
@@ -39,5 +47,21 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`printer`|`Exception -> Option<String>`|The exception printer to register|
+|`printer`|`Exception => Option<String>`|The exception printer to register|
+
+Examples:
+
+```grain
+exception ExampleError(Number)
+
+Exception.registerPrinter(e => {
+  match (e) {
+    ExampleError(lineNumber) =>
+      Some("Error found on line: " ++ toString(lineNumber)),
+    _ => None,
+  }
+})
+
+throw ExampleError(1) // Error found on line: 1
+```
 

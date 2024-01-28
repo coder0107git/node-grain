@@ -78,6 +78,7 @@ type error =
   | Value_not_found_in_module(Location.t, string, string)
   | Module_not_found_in_module(Location.t, string, string, option(string))
   | Type_not_found_in_module(Location.t, string, string)
+  | Exception_not_found_in_module(Location.t, string, string)
   | Illegal_value_name(Location.t, string)
   | Cyclic_dependencies(string, dependency_chain);
 
@@ -329,6 +330,8 @@ module IdTbl = {
     root: Path.t,
     /** Components from the opened module. */
     components: Tbl.t(string, ('a, int)),
+    /** Aliased names in the module. */
+    aliases: Tbl.t(string, string),
     /** A callback to be applied when a component is used from this
         "open".  This is used to detect unused "opens".  The
         arguments are used to detect shadowing. */
@@ -344,14 +347,17 @@ module IdTbl = {
     current: Ident.add(id, x, tbl.current),
   };
 
-  let add_open = (slot, wrap, root, components, next) => {
+  let add_open = (slot, wrap, root, components, aliases, next) => {
     let using =
       switch (slot) {
       | None => None
       | Some(f) => Some((s, x) => f(s, wrap(x)))
       };
 
-    {current: Ident.empty, opened: Some({using, root, components, next})};
+    {
+      current: Ident.empty,
+      opened: Some({using, root, components, aliases, next}),
+    };
   };
 
   let rec find_same = (id, tbl) =>
@@ -370,10 +376,14 @@ module IdTbl = {
     }) {
     | Not_found as exn =>
       switch (tbl.opened) {
-      | Some({using, root, next, components}) =>
+      | Some({using, root, next, components, aliases}) =>
         try({
           let (descr, pos) = Tbl.find(name, components);
-          let res = (PExternal(root, name), descr);
+          let aliased_name =
+            try(Tbl.find(name, aliases)) {
+            | Not_found => name
+            };
+          let res = (PExternal(root, aliased_name), descr);
           if (mark) {
             switch (using) {
             | None => ()
@@ -400,16 +410,16 @@ module IdTbl = {
     }) {
     | Not_found =>
       switch (tbl.opened) {
-      | Some({root, using, next, components}) =>
+      | Some({root, using, next, components, aliases}) =>
         try({
           let (desc, pos) = Tbl.find(name, components);
           let new_desc = f(desc);
           let components = Tbl.add(name, (new_desc, pos), components);
-          {...tbl, opened: Some({root, using, next, components})};
+          {...tbl, opened: Some({root, using, next, components, aliases})};
         }) {
         | Not_found =>
           let next = update(name, f, next);
-          {...tbl, opened: Some({root, using, next, components})};
+          {...tbl, opened: Some({root, using, next, components, aliases})};
         }
       | None => tbl
       }
@@ -932,6 +942,7 @@ let check_pers_struct = (~loc, name, filename) =>
       | Value_not_found_in_module(_) => assert(false)
       | Module_not_found_in_module(_) => assert(false)
       | Type_not_found_in_module(_) => assert(false)
+      | Exception_not_found_in_module(_) => assert(false)
       | Illegal_value_name(_) => assert(false)
       | Cyclic_dependencies(_) => assert(false)
       };
@@ -2012,10 +2023,11 @@ let rec add_signature = (sg, env) =>
 
 /* Open a signature path */
 
-let add_components = (slot, root, env0, comps) => {
+let add_components = (slot, root, env0, ~type_aliases=Tbl.empty, comps) => {
   let add_l = (w, comps, env0) => TycompTbl.add_open(slot, w, comps, env0);
 
-  let add = (w, comps, env0) => IdTbl.add_open(slot, w, root, comps, env0);
+  let add = (w, comps, ~aliases=Tbl.empty, env0) =>
+    IdTbl.add_open(slot, w, root, comps, aliases, env0);
 
   let constructors =
     add_l(x => `Constructor(x), comps.comp_constrs, env0.constructors);
@@ -2024,7 +2036,8 @@ let add_components = (slot, root, env0, comps) => {
 
   let values = add(x => `Value(x), comps.comp_values, env0.values);
 
-  let types = add(x => `Type(x), comps.comp_types, env0.types);
+  let types =
+    add(x => `Type(x), comps.comp_types, ~aliases=type_aliases, env0.types);
 
   let modtypes =
     add(x => `Module_type(x), comps.comp_modtypes, env0.modtypes);
@@ -2125,6 +2138,8 @@ let use_partial_signature = (root, items, env0) => {
     comp_modtypes: Tbl.empty,
   };
 
+  let type_aliases = ref(Tbl.empty);
+
   let items =
     List.map(
       item => {
@@ -2184,6 +2199,7 @@ let use_partial_signature = (root, items, env0) => {
           | ((decl, (constructors, labels)), _) as descr =>
             new_comps.comp_types =
               Tbl.add(new_name, descr, new_comps.comp_types);
+            type_aliases := Tbl.add(new_name, old_name, type_aliases^);
             List.iter(
               ({cstr_name}) => {
                 new_comps.comp_constrs =
@@ -2208,12 +2224,46 @@ let use_partial_signature = (root, items, env0) => {
             );
             TUseType({name: new_name, declaration: decl, loc});
           };
+        | PUseException({name, alias, loc}) =>
+          let (old_name, new_name) = apply_alias(name, alias);
+          switch (Tbl.find(old_name, comps.comp_constrs)) {
+          | exception Not_found =>
+            error(
+              Exception_not_found_in_module(
+                name.loc,
+                old_name,
+                Path.name(root),
+              ),
+            )
+          | cstrs =>
+            let (ext, cstr_name) =
+              List.find_map(
+                cstr =>
+                  switch (cstr.cstr_tag) {
+                  | CstrExtension(_, _, _, ext) =>
+                    Some((ext, cstr.cstr_name))
+                  | _ => None
+                  },
+                cstrs,
+              )
+              |> Option.get;
+            new_comps.comp_constrs =
+              Tbl.add(
+                new_name,
+                Tbl.find(cstr_name, comps.comp_constrs),
+                new_comps.comp_constrs,
+              );
+            TUseException({name: new_name, ext, loc});
+          };
         }
       },
       items,
     );
 
-  (add_components(None, root, env0, new_comps), items);
+  (
+    add_components(None, root, env0, new_comps, ~type_aliases=type_aliases^),
+    items,
+  );
 };
 
 let use_full_signature = (root, env0) => {
@@ -2592,6 +2642,8 @@ let report_error = ppf =>
     )
   | Type_not_found_in_module(_, name, path) =>
     fprintf(ppf, "Unbound type %s in module %s", name, path)
+  | Exception_not_found_in_module(_, name, path) =>
+    fprintf(ppf, "Unbound exception %s in module %s", name, path)
   | Cyclic_dependencies(dep, chain) =>
     fprintf(
       ppf,

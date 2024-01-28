@@ -20,7 +20,7 @@ include "runtime/unsafe/memory"
 include "runtime/unsafe/wasmi32"
 
 // TODO: Consider implementing this as List<(Box<k>, Box<v>)>
-record Bucket<k, v> {
+record rec Bucket<k, v> {
   mut key: k,
   mut value: v,
   mut next: Option<Bucket<k, v>>,
@@ -29,6 +29,14 @@ record Bucket<k, v> {
 abstract record Map<k, v> {
   mut size: Number,
   mut buckets: Array<Option<Bucket<k, v>>>,
+}
+
+/**
+ * Represents the internal state of a map.
+ */
+provide record InternalMapStats {
+  currentSize: Number,
+  bucketCount: Number,
 }
 
 /**
@@ -427,7 +435,7 @@ provide let fromList = list => {
  * @since v0.2.0
  */
 @unsafe
-provide let toArray: Map<a, b> -> Array<(a, b)> = map => {
+provide let toArray = (map: Map<a, b>) => {
   from WasmI32 use { (*) }
   let length = untagSimpleNumber(map.size)
   let array = WasmI32.toGrain(allocateArray(length))
@@ -446,7 +454,7 @@ provide let toArray: Map<a, b> -> Array<(a, b)> = map => {
     i + 1
   }
   reduce(reducer, 0, map)
-  array
+  array: Array<(a, b)>
 }
 
 /**
@@ -474,8 +482,8 @@ provide let fromArray = array => {
  *
  * @since v0.2.0
  */
-provide let filter = (predicate, map) => {
-  let keysToRemove = reduce((list, key, value) => if (!predicate(key, value)) {
+provide let filter = (fn, map) => {
+  let keysToRemove = reduce((list, key, value) => if (!fn(key, value)) {
     [key, ...list]
   } else {
     list
@@ -493,11 +501,10 @@ provide let filter = (predicate, map) => {
  *
  * @since v0.2.0
  */
-provide let reject = (predicate, map) => {
-  filter((key, value) => !predicate(key, value), map)
+provide let reject = (fn, map) => {
+  filter((key, value) => !fn(key, value), map)
 }
 
-// TODO(#190): Should return a Record type instead of a Tuple
 /**
  * Provides data representing the internal state state of the map.
  *
@@ -505,28 +512,29 @@ provide let reject = (predicate, map) => {
  * @returns The internal state of the map
  *
  * @since v0.2.0
+ * @history v0.6.0: Return `InternalMapStats` record instead of a tuple
  */
 provide let getInternalStats = map => {
-  (map.size, Array.length(map.buckets))
+  { currentSize: map.size, bucketCount: Array.length(map.buckets) }
 }
 
 /**
  * An immutable map implementation.
- * 
+ *
  * @since v0.6.0
  * @history v0.5.4: Originally in `"immutablemap"` module
  */
 provide module Immutable {
   // implementation based on the paper "Implementing Sets Efficiently in a
   // Functional Language" by Stephen Adams
-  record Node<k, v> {
+  record rec Node<k, v> {
     key: k,
     val: v,
     size: Number,
     left: Map<k, v>,
     right: Map<k, v>,
-  },
-  abstract enum Map<k, v> {
+  }
+  and abstract enum Map<k, v> {
     Empty,
     Tree(Node<k, v>),
   }
@@ -677,16 +685,16 @@ provide module Immutable {
    * @history v0.5.4: Originally in `"immutablemap"` module
    */
 
-  provide let rec set = (key, val, map) => {
+  provide let rec set = (key, value, map) => {
     match (map) {
-      Empty => Tree({ key, val, size: 1, left: Empty, right: Empty }),
+      Empty => Tree({ key, val: value, size: 1, left: Empty, right: Empty }),
       Tree({ key: nodeKey, val: nodeVal, left, right, _ }) => {
         match (compare(key, nodeKey)) {
           cmp when cmp < 0 =>
-            balancedNode(nodeKey, nodeVal, set(key, val, left), right),
+            balancedNode(nodeKey, nodeVal, set(key, value, left), right),
           cmp when cmp > 0 =>
-            balancedNode(nodeKey, nodeVal, left, set(key, val, right)),
-          _ => makeNode(key, val, left, right),
+            balancedNode(nodeKey, nodeVal, left, set(key, value, right)),
+          _ => makeNode(key, value, left, right),
         }
       },
     }

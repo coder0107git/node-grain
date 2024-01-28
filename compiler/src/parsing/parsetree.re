@@ -116,6 +116,7 @@ type data_declaration = {
   pdata_params: list(parsed_type),
   pdata_kind: data_kind,
   pdata_manifest: option(parsed_type),
+  pdata_rec: rec_flag,
   [@sexp_drop_if sexp_locs_disabled]
   pdata_loc: Location.t,
 };
@@ -334,7 +335,8 @@ type prim0 =
   | AllocateRational
   | WasmMemorySize
   | Unreachable
-  | HeapStart;
+  | HeapStart
+  | HeapTypeMetadata;
 
 /** Single-argument operators */
 [@deriving (sexp, yojson)]
@@ -458,6 +460,11 @@ type use_items =
 [@deriving (sexp, yojson)]
 and use_item =
   | PUseType({
+      name: loc(Identifier.t),
+      alias: option(loc(Identifier.t)),
+      loc: Location.t,
+    })
+  | PUseException({
       name: loc(Identifier.t),
       alias: option(loc(Identifier.t)),
       loc: Location.t,
@@ -589,6 +596,11 @@ type value_description = {
 [@deriving (sexp, yojson)]
 type provide_item =
   | PProvideType({
+      name: loc(Identifier.t),
+      alias: option(loc(Identifier.t)),
+      loc: Location.t,
+    })
+  | PProvideException({
       name: loc(Identifier.t),
       alias: option(loc(Identifier.t)),
       loc: Location.t,

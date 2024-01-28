@@ -21,7 +21,7 @@ include "option"
 abstract record PriorityQueue<a> {
   mut size: Number,
   mut array: Array<Option<a>>,
-  comp: (a, a) -> Number,
+  comp: (a, a) => Number,
 }
 
 let swap = (i1, i2, array) => {
@@ -264,7 +264,7 @@ provide module Immutable {
   // as described in the paper "Optimal Purely Functional Priority Queues" by Chris Okasaki.
 
   // rank is a stand-in for height of this skew binomial tree
-  record Node<a> {
+  record rec Node<a> {
     val: a,
     rank: Number,
     children: List<Node<a>>,
@@ -283,7 +283,7 @@ provide module Immutable {
    */
 
   abstract record PriorityQueue<a> {
-    comp: (a, a) -> Number,
+    comp: (a, a) => Number,
     size: Number,
     root: Option<PQRoot<a>>,
   }
@@ -330,7 +330,7 @@ provide module Immutable {
    * @history v0.5.3: Originally in `"immutablepriorityqueue"` module
    */
 
-  provide let size = ({ size, _ }: PriorityQueue<a>) => {
+  provide let size = ({ size, _ } as pq: PriorityQueue<a>) => {
     size
   }
 
@@ -344,7 +344,7 @@ provide module Immutable {
    * @history v0.5.3: Originally in `"immutablepriorityqueue"` module
    */
 
-  provide let isEmpty = ({ size, _ }: PriorityQueue<a>) => {
+  provide let isEmpty = ({ size, _ } as pq: PriorityQueue<a>) => {
     size == 0
   }
 

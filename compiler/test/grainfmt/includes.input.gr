@@ -10,8 +10,8 @@ include "option" as
 include /* special include */ "array"
 include "array" as  /* special include */ Foo
 from List use { length, map, forEach as each }
-from Opt use { MutableOpt, ImmutableOpt as Imm, type Opt, type Opt as OptAlias }
-from Opt use { MutableOpt, /* comment1 */ ImmutableOpt /* comment2 */ as /* comment3 */ Imm /* comment4 */, /* comment5 */ type /* comment6 */ Opt, type Opt as /* comment7 */ OptAlias }
+from Opt use { module MutableOpt, module ImmutableOpt as Imm, type Opt, type Opt as OptAlias }
+from Opt use { module MutableOpt, /* comment1 */ module ImmutableOpt /* comment2 */ as /* comment3 */ Imm /* comment4 */, /* comment5 */ type /* comment6 */ Opt, type Opt as /* comment7 */ OptAlias, exception Exc as /* comment8 */ E, exception Exc2 /* comment9 */ }
 
 include "runtime/unsafe/wasmi32"
 from WasmI32 use { 
@@ -21,16 +21,18 @@ from WasmI32 use {
   shl as (<<)
 }
 
-provide foreign wasm storage_read: (WasmI64, WasmI64, WasmI64) -> WasmI64 as storageRead from "env"
+provide foreign wasm storage_read: (WasmI64, WasmI64, WasmI64) => WasmI64 as storageRead from "env"
 
 
 include "runtime/unsafe/wasmi32"
 from WasmI32 use {
   eq, // comment1
   // comment 3
-  and as (&), // comment 2
+  and_ as (&), // comment 2
   or as (|)
   // no signed imports, as care should be taken to use signed or unsigned operators
 }
 
-provide foreign wasm promise_results_count: () -> WasmI64 as promiseResultsCount from "env"
+provide foreign wasm promise_results_count: () => WasmI64 as promiseResultsCount from "env"
+
+provide {exception MyExc as E2}

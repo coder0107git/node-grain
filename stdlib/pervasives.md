@@ -25,7 +25,7 @@ No other changes yet.
 </details>
 
 ```grain
-(!) : Bool -> Bool
+(!) : Bool => Bool
 ```
 
 Computes the logical NOT (`!`) of the given operand.
@@ -35,7 +35,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`Bool`|The operand|
+|`0`|`Bool`|The operand|
 
 Returns:
 
@@ -61,7 +61,7 @@ No other changes yet.
 </details>
 
 ```grain
-(&&) : (Bool, Bool) -> Bool
+(&&) : (Bool, Bool) => Bool
 ```
 
 Computes the logical AND (`&&`) of the given operands.
@@ -73,8 +73,8 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value1`|`Bool`|The first operand|
-|`value2`|`Bool`|The second operand|
+|`0`|`Bool`|The first operand|
+|`1`|`Bool`|The second operand|
 
 Returns:
 
@@ -90,7 +90,7 @@ No other changes yet.
 </details>
 
 ```grain
-(||) : (Bool, Bool) -> Bool
+(||) : (Bool, Bool) => Bool
 ```
 
 Computes the logical OR `||` of the given operands.
@@ -102,8 +102,8 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value1`|`Bool`|The first operand|
-|`value2`|`Bool`|The second operand|
+|`0`|`Bool`|The first operand|
+|`1`|`Bool`|The second operand|
 
 Returns:
 
@@ -119,7 +119,7 @@ No other changes yet.
 </details>
 
 ```grain
-(==) : (x: a, y: a) -> Bool
+(==) : (value1: a, value2: a) => Bool
 ```
 
 Check that two values are equal. This checks for structural equality,
@@ -146,7 +146,7 @@ No other changes yet.
 </details>
 
 ```grain
-(!=) : (a, a) -> Bool
+(!=) : (value1: a, value2: a) => Bool
 ```
 
 Check that two values are **not** equal. This checks for structural equality,
@@ -173,7 +173,7 @@ No other changes yet.
 </details>
 
 ```grain
-is : (a, a) -> Bool
+is : (a, a) => Bool
 ```
 
 Checks that two values are physically equal.
@@ -183,8 +183,8 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value1`|`a`|The first operand|
-|`value2`|`a`|The second operand|
+|`0`|`a`|The first operand|
+|`1`|`a`|The second operand|
 
 Returns:
 
@@ -200,7 +200,7 @@ No other changes yet.
 </details>
 
 ```grain
-isnt : (a, a) -> Bool
+isnt : (value1: a, value2: a) => Bool
 ```
 
 Checks that two values are **not** physically equal.
@@ -227,7 +227,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<) : (x: Number, y: Number) -> Bool
+(<) : (num1: Number, num2: Number) => Bool
 ```
 
 Checks if the first operand is less than the second operand.
@@ -253,7 +253,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>) : (x: Number, y: Number) -> Bool
+(>) : (num1: Number, num2: Number) => Bool
 ```
 
 Checks if the first operand is greater than the second operand.
@@ -279,7 +279,7 @@ No other changes yet.
 </details>
 
 ```grain
-(<=) : (x: Number, y: Number) -> Bool
+(<=) : (num1: Number, num2: Number) => Bool
 ```
 
 Checks if the first operand is less than or equal to the second operand.
@@ -305,7 +305,7 @@ No other changes yet.
 </details>
 
 ```grain
-(>=) : (x: Number, y: Number) -> Bool
+(>=) : (num1: Number, num2: Number) => Bool
 ```
 
 Checks if the first operand is greater than or equal to the second operand.
@@ -331,7 +331,7 @@ No other changes yet.
 </details>
 
 ```grain
-compare : (x: a, y: a) -> Number
+compare : (num1: a, num2: a) => Number
 ```
 
 Compares the first argument to the second argument and produces an integer result.
@@ -359,7 +359,7 @@ No other changes yet.
 </details>
 
 ```grain
-(+) : (x: Number, y: Number) -> Number
+(+) : (num1: Number, num2: Number) => Number
 ```
 
 Computes the sum of its operands.
@@ -385,7 +385,7 @@ No other changes yet.
 </details>
 
 ```grain
-(-) : (x: Number, y: Number) -> Number
+(-) : (num1: Number, num2: Number) => Number
 ```
 
 Computes the difference of its operands.
@@ -411,7 +411,7 @@ No other changes yet.
 </details>
 
 ```grain
-(*) : (x: Number, y: Number) -> Number
+(*) : (num1: Number, num2: Number) => Number
 ```
 
 Computes the product of its operands.
@@ -437,7 +437,7 @@ No other changes yet.
 </details>
 
 ```grain
-(/) : (x: Number, y: Number) -> Number
+(/) : (num1: Number, num2: Number) => Number
 ```
 
 Computes the quotient of its operands.
@@ -463,7 +463,7 @@ No other changes yet.
 </details>
 
 ```grain
-(%) : (x: Number, y: Number) -> Number
+(%) : (num1: Number, num2: Number) => Number
 ```
 
 Computes the remainder of the division of the first operand by the second.
@@ -497,7 +497,7 @@ Returns:
 </details>
 
 ```grain
-(**) : (base: Number, power: Number) -> Number
+(**) : (base: Number, power: Number) => Number
 ```
 
 Computes the exponentiation of the given base and power.
@@ -523,7 +523,7 @@ No other changes yet.
 </details>
 
 ```grain
-incr : (x: Number) -> Number
+incr : (value: Number) => Number
 ```
 
 Increments the value by one.
@@ -548,7 +548,7 @@ No other changes yet.
 </details>
 
 ```grain
-decr : (x: Number) -> Number
+decr : (value: Number) => Number
 ```
 
 Decrements the value by one.
@@ -573,7 +573,7 @@ No other changes yet.
 </details>
 
 ```grain
-(++) : (s1: String, s2: String) -> String
+(++) : (str1: String, str2: String) => String
 ```
 
 Concatenate two strings.
@@ -605,7 +605,7 @@ No other changes yet.
 </details>
 
 ```grain
-lnot : (x: Number) -> Number
+lnot : (value: Number) => Number
 ```
 
 Computes the bitwise NOT of the operand.
@@ -638,7 +638,7 @@ Returns:
 </details>
 
 ```grain
-(&) : (x: Number, y: Number) -> Number
+(&) : (value1: Number, value2: Number) => Number
 ```
 
 Computes the bitwise AND (`&`) on the given operands.
@@ -672,7 +672,7 @@ Returns:
 </details>
 
 ```grain
-(|) : (x: Number, y: Number) -> Number
+(|) : (value1: Number, value2: Number) => Number
 ```
 
 Computes the bitwise OR (`|`) on the given operands.
@@ -707,7 +707,7 @@ Returns:
 </details>
 
 ```grain
-(^) : (x: Number, y: Number) -> Number
+(^) : (value1: Number, value2: Number) => Number
 ```
 
 Computes the bitwise XOR (`^`) on the given operands.
@@ -741,7 +741,7 @@ Returns:
 </details>
 
 ```grain
-(<<) : (x: Number, y: Number) -> Number
+(<<) : (value: Number, amount: Number) => Number
 ```
 
 Shifts the bits of the value left by the given number of bits.
@@ -775,7 +775,7 @@ Returns:
 </details>
 
 ```grain
-(>>>) : (x: Number, y: Number) -> Number
+(>>>) : (value: Number, amount: Number) => Number
 ```
 
 Shifts the bits of the value right by the given number of bits, preserving the sign bit.
@@ -809,7 +809,7 @@ Returns:
 </details>
 
 ```grain
-(>>) : (x: Number, y: Number) -> Number
+(>>) : (value: Number, amount: Number) => Number
 ```
 
 Shifts the bits of the value right by the given number of bits.
@@ -835,7 +835,7 @@ No other changes yet.
 </details>
 
 ```grain
-toString : (value: a) -> String
+toString : (value: a) => String
 ```
 
 Converts the given operand to a string.
@@ -861,7 +861,7 @@ No other changes yet.
 </details>
 
 ```grain
-print : (value: a) -> Void
+print : (value: a) => Void
 ```
 
 Prints the given operand to the console. Works for any type. Internally, calls `toString`
@@ -882,7 +882,7 @@ No other changes yet.
 </details>
 
 ```grain
-ignore : a -> Void
+ignore : a => Void
 ```
 
 Accepts any value and always returns `void`.
@@ -891,7 +891,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`value`|`a`|The value to ignore|
+|`0`|`a`|The value to ignore|
 
 ### Pervasives.**assert**
 
@@ -901,7 +901,7 @@ No other changes yet.
 </details>
 
 ```grain
-assert : Bool -> Void
+assert : Bool => Void
 ```
 
 Assert that the given Boolean condition is `true`.
@@ -910,7 +910,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`condition`|`Bool`|The condition to assert|
+|`0`|`Bool`|The condition to assert|
 
 Throws:
 
@@ -936,7 +936,7 @@ No other changes yet.
 </details>
 
 ```grain
-throw : Exception -> a
+throw : Exception => a
 ```
 
 Throw an exception. Currently, exceptions cannot be caught and will crash your program.
@@ -945,7 +945,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`exception`|`Exception`|The exception to be thrown|
+|`0`|`Exception`|The exception to be thrown|
 
 Returns:
 
@@ -956,7 +956,7 @@ Returns:
 ### Pervasives.**fail**
 
 ```grain
-fail : String -> a
+fail : (message: String) => a
 ```
 
 Unconditionally throw a `Failure` exception with a message.
@@ -982,7 +982,7 @@ No other changes yet.
 </details>
 
 ```grain
-identity : (x: a) -> a
+identity : (value: a) => a
 ```
 
 Provides the operand untouched.
@@ -1007,7 +1007,7 @@ No other changes yet.
 </details>
 
 ```grain
-box : a -> Box<a>
+box : a => Box<a>
 ```
 
 Creates a box containing the given initial value.
@@ -1018,7 +1018,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`initial`|`a`|The initial value inside the box|
+|`0`|`a`|The initial value inside the box|
 
 Returns:
 
@@ -1034,7 +1034,7 @@ No other changes yet.
 </details>
 
 ```grain
-unbox : Box<a> -> a
+unbox : Box<a> => a
 ```
 
 Retrieves the current value from a box.
@@ -1043,7 +1043,7 @@ Parameters:
 
 |param|type|description|
 |-----|----|-----------|
-|`box`|`Box<a>`|The box to unwrap|
+|`0`|`Box<a>`|The box to unwrap|
 
 Returns:
 

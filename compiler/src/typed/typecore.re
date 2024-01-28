@@ -110,6 +110,18 @@ let grain_type_of_wasm_prim_type =
 let prim_type = (args, ret) =>
   newgenty(TTyArrow(List.map(ty => (Unlabeled, ty), args), ret, TComOk));
 
+let prim_type_labeled = (args, ret) =>
+  newgenty(
+    TTyArrow(
+      List.map(
+        ((name, ty)) => (Labeled(Location.mknoloc(name)), ty),
+        args,
+      ),
+      ret,
+      TComOk,
+    ),
+  );
+
 let prim0_type =
   fun
   | AllocateInt32
@@ -120,7 +132,8 @@ let prim0_type =
   | AllocateFloat64
   | AllocateRational
   | WasmMemorySize
-  | HeapStart => prim_type([], Builtin_types.type_wasmi32)
+  | HeapStart
+  | HeapTypeMetadata => prim_type([], Builtin_types.type_wasmi32)
   | Unreachable => prim_type([], newgenvar(~name="a", ()));
 
 let prim1_type =
@@ -189,7 +202,10 @@ let prim1_type =
     }
   | ArrayLength => {
       let var = newgenvar(~name="a", ());
-      prim_type([Builtin_types.type_array(var)], Builtin_types.type_number);
+      prim_type_labeled(
+        [("array", Builtin_types.type_array(var))],
+        Builtin_types.type_number,
+      );
     }
   | Assert => prim_type([Builtin_types.type_bool], Builtin_types.type_void)
   | Throw =>
@@ -1023,6 +1039,7 @@ and type_expect_ =
             let default_loc = default.pexp_loc;
             let scases = [
               MatchBranch.mk(
+                ~loc=default_loc,
                 Pattern.construct(
                   ~loc=default_loc,
                   mknoloc(Identifier.IdentName(mknoloc("Some"))),
@@ -1037,6 +1054,7 @@ and type_expect_ =
                 None,
               ),
               MatchBranch.mk(
+                ~loc=default_loc,
                 Pattern.construct(
                   ~loc=default_loc,
                   mknoloc(Identifier.IdentName(mknoloc("None"))),
@@ -1067,7 +1085,7 @@ and type_expect_ =
                 ~loc=sloc,
                 Nonrecursive,
                 Immutable,
-                [ValueBinding.mk(arg.pla_pattern, smatch)],
+                [ValueBinding.mk(~loc=arg.pla_loc, arg.pla_pattern, smatch)],
               );
             (
               [pat, ...args],
@@ -1092,7 +1110,7 @@ and type_expect_ =
           Location.mknoloc(Identifier.IdentName(Location.mknoloc("()"))),
           [],
         )
-      | args => Pattern.tuple(args)
+      | args => Pattern.tuple(~loc=Location.dummy_loc, args)
       };
     let body =
       switch (prelude) {
@@ -1106,7 +1124,7 @@ and type_expect_ =
       env,
       ty_expected_explained,
       labels,
-      [MatchBranch.mk(pat, body, None)],
+      [MatchBranch.mk(~loc, pat, body, None)],
     );
   | PExpApp(func, args) =>
     begin_def(); /* one more level for non-returning functions */

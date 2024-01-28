@@ -71,13 +71,23 @@ describe("includes", ({test, testSkip}) => {
   );
   assertCompileError(
     "include_some_error3",
-    "include \"provideAll\" as ProvideAll; from ProvideAll use {Foo}; a",
+    "include \"provideAll\" as ProvideAll; from ProvideAll use {module Foo}",
     "Unbound module Foo in module ProvideAll",
   );
   assertCompileError(
-    "include_some_error3",
-    "include \"provideAll\" as ProvideAll; from ProvideAll use {x, Foo}; a",
+    "include_some_error4",
+    "include \"provideAll\" as ProvideAll; from ProvideAll use {x, module Foo}",
     "Unbound module Foo in module ProvideAll",
+  );
+  assertCompileError(
+    "include_some_error5",
+    "include \"provideAll\" as ProvideAll; from ProvideAll use {Foo}",
+    "Expected a lowercase identifier to use a value, the keyword `module` followed by an uppercase identifier to use a module, or the keyword `type` followed by an uppercase identifier to use a type.",
+  );
+  assertCompileError(
+    "include_some_error6",
+    "include \"provideAll\" as ProvideAll; from ProvideAll use {a, Foo}",
+    "Expected a lowercase identifier to use a value, the keyword `module` followed by an uppercase identifier to use a module, the keyword `type` followed by an uppercase identifier to use a type, or `}` to end the use statement.",
   );
   /* include module tests */
   assertSnapshot("include_module", "include \"provideAll\" as Foo; Foo.x");
@@ -94,12 +104,12 @@ describe("includes", ({test, testSkip}) => {
   /* use well-formedness errors */
   assertCompileError(
     "include_alias_illegal_renaming",
-    "include \"list\" as List; from List use {Cons as cons, Empty}; cons(3, Empty)",
+    "include \"list\" as List; from List use {module Cons as cons, module Empty}; cons(3, Empty)",
     "Expected an uppercase module alias",
   );
   assertCompileError(
     "include_alias_illegal_renaming2",
-    "include \"list\" as List; from List use {sum as Sum, Empty}; sum(Empty)",
+    "include \"list\" as List; from List use {sum as Sum, module Empty}; sum(Empty)",
     "Expected a lowercase alias",
   );
   assertCompileError(
@@ -163,5 +173,20 @@ describe("includes", ({test, testSkip}) => {
     "include_broken",
     "brokenIncludes/main",
     "./broken.gr\", line 4, characters 8-15",
+  );
+  assertRun(
+    "reprovide_values",
+    "include \"reprovideContents\"; from ReprovideContents use { type Type, module Mod }; print(A); print(Mod.val)",
+    "A\n123\n",
+  );
+  assertRun(
+    "reprovide_type2",
+    "include \"reprovideContents\"; from ReprovideContents use { type OtherT as TT, val }; print(val); print({ x: 2 })",
+    "{\n  x: 1\n}\n{\n  x: 2\n}\n",
+  );
+  assertRun(
+    "reprovide_type3",
+    "include \"reprovideContents\"; from ReprovideContents use { type OtherT as Other }; print({ x: 1 }: Other)",
+    "{\n  x: 1\n}\n",
   );
 });

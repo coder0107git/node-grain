@@ -38,6 +38,7 @@ module Grain_parsing = struct end
 %token <string> INFIX_ASSIGNMENT_10
 
 %token ENUM RECORD TYPE MODULE INCLUDE USE PROVIDE ABSTRACT FOREIGN WASM PRIMITIVE
+%token AND
 %token EXCEPT FROM STAR
 %token SLASH DASH PIPE
 %token EOL EOF
@@ -194,6 +195,10 @@ arrow:
 thickarrow:
   | THICKARROW opt_eols {}
 
+either_arrow:
+  | arrow {}
+  | thickarrow {}
+
 equal:
   | EQUAL opt_eols {}
 
@@ -298,9 +303,9 @@ data_typ:
   | qualified_uid %prec _below_infix { Type.constr ~loc:(to_loc $loc) $1 [] }
 
 typ:
-  | data_typ arrow typ { Type.arrow ~loc:(to_loc $loc) [TypeArgument.mk ~loc:(to_loc $loc($1)) Unlabeled $1] $3 }
-  | FUN LIDENT arrow typ { Type.arrow ~loc:(to_loc $loc) [TypeArgument.mk ~loc:(to_loc $loc($2)) Unlabeled (Type.var $2)] $4 }
-  | FUN lparen arg_typs? rparen arrow typ { Type.arrow ~loc:(to_loc $loc) (Option.value ~default:[] $3) $6 }
+  | FUN data_typ either_arrow typ { Type.arrow ~loc:(to_loc $loc) [TypeArgument.mk ~loc:(to_loc $loc($2)) Unlabeled $2] $4 }
+  | FUN LIDENT either_arrow typ { Type.arrow ~loc:(to_loc $loc) [TypeArgument.mk ~loc:(to_loc $loc($2)) Unlabeled (Type.var ~loc:(to_loc $loc($2)) $2)] $4 }
+  | FUN lparen arg_typs? rparen either_arrow typ { Type.arrow ~loc:(to_loc $loc) (Option.value ~default:[] $3) $6 }
   | lparen tuple_typs rparen { Type.tuple ~loc:(to_loc $loc) $2 }
   | lparen typ rparen { $2 }
   | LIDENT { Type.var ~loc:(to_loc $loc) $1 }
@@ -327,7 +332,7 @@ value_bind:
   | pattern equal expr { ValueBinding.mk ~loc:(to_loc $loc) $1 $3 }
 
 value_binds:
-  | lseparated_nonempty_list(comma, value_bind) { $1 }
+  | lseparated_nonempty_list(AND, value_bind) { $1 }
 
 as_prefix(X):
   | AS opt_eols X {$3}
@@ -337,7 +342,8 @@ aliasable(X):
 
 use_item:
   | TYPE aliasable(uid) { PUseType { name=fst $2; alias = snd $2; loc=to_loc $loc} }
-  | aliasable(uid) { PUseModule { name=fst $1; alias = snd $1; loc=to_loc $loc} }
+  | MODULE aliasable(uid) { PUseModule { name=fst $2; alias = snd $2; loc=to_loc $loc} }
+  | EXCEPTION aliasable(uid) { PUseException { name=fst $2; alias = snd $2; loc=to_loc $loc} }
   | aliasable(lid) { PUseValue { name=fst $1; alias = snd $1; loc=to_loc $loc} }
 
 use_items:
@@ -362,11 +368,12 @@ data_declaration_stmt:
   | data_declaration { (NotProvided, $1) }
 
 data_declaration_stmts:
-  | separated_nonempty_list(comma, data_declaration_stmt) { $1 }
+  | separated_nonempty_list(AND, data_declaration_stmt) { $1 }
 
 provide_item:
   | TYPE aliasable(uid) { PProvideType { name=fst $2; alias = snd $2; loc=to_loc $loc} }
-  | aliasable(uid) { PProvideModule { name=fst $1; alias = snd $1; loc=to_loc $loc} }
+  | MODULE aliasable(uid) { PProvideModule { name=fst $2; alias = snd $2; loc=to_loc $loc} }
+  | EXCEPTION aliasable(uid) { PProvideException { name=fst $2; alias = snd $2; loc=to_loc $loc} }
   | aliasable(lid) { PProvideValue { name=fst $1; alias = snd $1; loc=to_loc $loc} }
 
 provide_items:
@@ -410,10 +417,13 @@ id_typ:
 id_vec:
   | lcaret lseparated_nonempty_list(comma, id_typ) comma? rcaret {$2}
 
+rec_flag:
+  | REC { Recursive }
+
 data_declaration:
-  | TYPE UIDENT id_vec? equal typ { DataDeclaration.abstract ~loc:(to_loc $loc) (mkstr $loc($2) $2) (Option.value ~default:[] $3) (Some $5) }
-  | ENUM UIDENT id_vec? data_constructors { DataDeclaration.variant ~loc:(to_loc $loc) (mkstr $loc($2) $2) (Option.value ~default:[] $3) $4 }
-  | RECORD UIDENT id_vec? data_record_body { DataDeclaration.record ~loc:(to_loc $loc) (mkstr $loc($2) $2) (Option.value ~default:[] $3) $4 }
+  | TYPE rec_flag? UIDENT id_vec? equal typ { DataDeclaration.abstract ~loc:(to_loc $loc) ?rec_flag:$2 (mkstr $loc($3) $3) (Option.value ~default:[] $4) (Some $6) }
+  | ENUM rec_flag? UIDENT id_vec? data_constructors { DataDeclaration.variant ~loc:(to_loc $loc) ?rec_flag:$2 (mkstr $loc($3) $3) (Option.value ~default:[] $4) $5 }
+  | RECORD rec_flag? UIDENT id_vec? data_record_body { DataDeclaration.record ~loc:(to_loc $loc) ?rec_flag:$2 (mkstr $loc($3) $3) (Option.value ~default:[] $4) $5 }
 
 unop_expr:
   | prefix_op non_assign_expr { Expression.apply ~loc:(to_loc $loc) (mkid_expr $loc($1) [mkstr $loc($1) $1]) [{paa_label=Unlabeled; paa_expr=$2; paa_loc=(to_loc $loc($2))}] }
@@ -626,6 +636,7 @@ array_get:
 
 array_set:
   | left_accessor_expr lbrack expr rbrack equal expr { Expression.array_set ~loc:(to_loc $loc) $1 $3 $6 }
+  | left_accessor_expr lbrack expr rbrack assign_binop_op expr { Expression.array_set ~loc:(to_loc $loc) $1 $3 (Expression.apply ~loc:(to_loc $loc) (mkid_expr $loc($5) [$5]) [{paa_label=Unlabeled; paa_expr=Expression.array_get ~loc:(to_loc $loc) $1 $3; paa_loc=(to_loc $loc($6))}; {paa_label=Unlabeled; paa_expr=$6; paa_loc=(to_loc $loc($6))}]) }
 
 record_get:
   | left_accessor_expr dot lid { Expression.record_get ~loc:(to_loc $loc) $1 $3 }

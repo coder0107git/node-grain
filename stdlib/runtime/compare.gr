@@ -156,8 +156,8 @@ let rec heapCompareHelp = (heapTag, xptr, yptr) => {
       return tagSimpleNumber(xptr - yptr)
     },
   }
-},
-compareHelp = (x, y) => {
+}
+and compareHelp = (x, y) => {
   let xtag = x & Tags._GRAIN_GENERIC_TAG_MASK
   let ytag = y & Tags._GRAIN_GENERIC_TAG_MASK
   if ((xtag & ytag) != Tags._GRAIN_GENERIC_HEAP_TAG_TYPE) {
@@ -221,6 +221,6 @@ compareHelp = (x, y) => {
  * @since v0.5.3
  */
 @unsafe
-provide let compare = (x: a, y: a) => {
-  compareHelp(WasmI32.fromGrain(x), WasmI32.fromGrain(y))
+provide let compare = (num1: a, num2: a) => {
+  compareHelp(WasmI32.fromGrain(num1), WasmI32.fromGrain(num2))
 }

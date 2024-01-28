@@ -168,7 +168,8 @@ type prim0 =
     | AllocateRational
     | WasmMemorySize
     | Unreachable
-    | HeapStart;
+    | HeapStart
+    | HeapTypeMetadata;
 
 type prim1 =
   Parsetree.prim1 =
@@ -410,8 +411,7 @@ type import_shape =
 type import_desc =
   | GrainValue(string, string)
   | WasmFunction(string, string)
-  | WasmValue(string, string)
-  | JSFunction(string, string);
+  | WasmValue(string, string);
 
 [@deriving sexp]
 type import_spec = {

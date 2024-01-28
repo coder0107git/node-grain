@@ -190,6 +190,12 @@ module E = {
                     alias: Option.map(map_identifier(sub), alias),
                     loc: sub.location(sub, loc),
                   })
+                | PUseException({name, alias, loc}) =>
+                  PUseException({
+                    name: map_identifier(sub, name),
+                    alias: Option.map(map_identifier(sub), alias),
+                    loc: sub.location(sub, loc),
+                  })
                 | PUseModule({name, alias, loc}) =>
                   PUseModule({
                     name: map_identifier(sub, name),
@@ -302,6 +308,7 @@ module D = {
       (
         sub,
         {
+          pdata_rec: rec_flag,
           pdata_name: name,
           pdata_params: args,
           pdata_kind: kind,
@@ -315,11 +322,17 @@ module D = {
     let sargs = List.map(sub.typ(sub), args);
     let sman = Option.map(sub.typ(sub), man);
     switch (kind) {
-    | PDataAbstract => abstract(~loc, sname, sargs, sman)
+    | PDataAbstract => abstract(~loc, ~rec_flag, sname, sargs, sman)
     | PDataVariant(cdl) =>
-      variant(~loc, sname, sargs, List.map(sub.constructor(sub), cdl))
+      variant(
+        ~loc,
+        ~rec_flag,
+        sname,
+        sargs,
+        List.map(sub.constructor(sub), cdl),
+      )
     | PDataRecord(ldl) =>
-      record(~loc, sname, sargs, List.map(sub.label(sub), ldl))
+      record(~loc, ~rec_flag, sname, sargs, List.map(sub.label(sub), ldl))
     };
   };
 };
@@ -421,6 +434,12 @@ module Pr = {
         switch (item) {
         | PProvideType({name, alias, loc}) =>
           PProvideType({
+            name: map_identifier(sub, name),
+            alias: Option.map(map_identifier(sub), alias),
+            loc: sub.location(sub, loc),
+          })
+        | PProvideException({name, alias, loc}) =>
+          PProvideException({
             name: map_identifier(sub, name),
             alias: Option.map(map_identifier(sub), alias),
             loc: sub.location(sub, loc),

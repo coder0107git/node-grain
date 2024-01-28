@@ -63,6 +63,15 @@ program: MODULE UIDENT EOL INCLUDE STRING AS YIELD
 ## The known suffix of the stack is as follows:
 ## AS
 ##
+program: MODULE UIDENT EOL PROVIDE LBRACE MODULE YIELD
+##
+## Ends in an error in state: 829.
+##
+## provide_item -> MODULE . aliasable(uid) [ RBRACE EOL COMMA ]
+##
+## The known suffix of the stack is as follows:
+## MODULE
+##
 
 Expected an uppercase module identifier.
 
@@ -269,14 +278,14 @@ program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON UIDENT AS YIELD
 ## The known suffix of the stack is as follows:
 ## AS
 ##
-program: MODULE UIDENT EOL PROVIDE LBRACE UIDENT AS EOL YIELD
+program: MODULE UIDENT EOL PROVIDE LBRACE MODULE UIDENT AS EOL YIELD
 ##
-## Ends in an error in state: 51.
+## Ends in an error in state: 52.
 ##
-## as_prefix(uid) -> AS option(eols) . uid [ RBRACE EOL COMMA ]
+## as_prefix(uid) -> AS eols . uid [ RBRACE EOL COMMA ]
 ##
 ## The known suffix of the stack is as follows:
-## AS option(eols)
+## AS eols
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
@@ -284,7 +293,6 @@ program: MODULE UIDENT EOL PROVIDE LBRACE UIDENT AS EOL YIELD
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
 ## In state 6, spurious reduction of production eols -> nonempty_list(eol)
-## In state 53, spurious reduction of production option(eols) -> eols
 ##
 program: MODULE UIDENT EOL PROVIDE LBRACE LIDENT AS EOL YIELD
 ##
@@ -348,7 +356,7 @@ program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON UIDENT AS LIDENT YIELD
 ## The known suffix of the stack is as follows:
 ## FOREIGN WASM id_str COLON typ option(as_prefix(id_str))
 ##
-program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON EOL LIDENT ARROW
+program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON EOL LIDENT THICKARROW
 ##
 ## Ends in an error in state: 757.
 ##
@@ -366,7 +374,7 @@ program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON EOL UIDENT AS LIDENT YIELD
 ## The known suffix of the stack is as follows:
 ## FOREIGN WASM id_str COLON eols typ option(as_prefix(id_str))
 ##
-program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON LIDENT ARROW
+program: MODULE UIDENT EOL FOREIGN WASM LIDENT COLON LIDENT THICKARROW
 ##
 ## Ends in an error in state: 749.
 ##
@@ -424,7 +432,7 @@ program: MODULE UIDENT EOL FROM UIDENT USE LBRACE YIELD
 ## In state 31, spurious reduction of production lbrace -> LBRACE
 ##
 
-Expected a lowercase identifier to use a value, an uppercase identifier to use a module, or the keyword `type` followed by an uppercase identifier to use a type.
+Expected a lowercase identifier to use a value, the keyword `module` followed by an uppercase identifier to use a module, or the keyword `type` followed by an uppercase identifier to use a type.
 
 program: MODULE UIDENT EOL FROM UIDENT USE LBRACE TYPE YIELD
 ##
@@ -435,10 +443,31 @@ program: MODULE UIDENT EOL FROM UIDENT USE LBRACE TYPE YIELD
 ## The known suffix of the stack is as follows:
 ## TYPE
 ##
+program: MODULE UIDENT EOL FROM UIDENT USE LBRACE MODULE YIELD
+##
+## Ends in an error in state: 57.
+##
+## use_item -> MODULE . aliasable(uid) [ RBRACE EOL COMMA ]
+##
+## The known suffix of the stack is as follows:
+## MODULE
+##
 
 Expected an uppercase type identifier.
 
-program: MODULE UIDENT EOL PROVIDE LBRACE UIDENT YIELD
+program: MODULE UIDENT EOL FROM UIDENT USE LBRACE EXCEPTION YIELD
+##
+## Ends in an error in state: 57.
+##
+## use_item -> EXCEPTION . aliasable(uid) [ RBRACE EOL COMMA ]
+##
+## The known suffix of the stack is as follows:
+## EXCEPTION
+##
+
+Expected an uppercase exception identifier.
+
+program: MODULE UIDENT EOL PROVIDE LBRACE MODULE UIDENT YIELD
 ##
 ## Ends in an error in state: 49.
 ##
@@ -450,11 +479,12 @@ program: MODULE UIDENT EOL PROVIDE LBRACE UIDENT YIELD
 
 Expected the keyword `as` followed by a module alias, a comma followed by more items to use, or `}` to end the statement.
 
-program: MODULE UIDENT EOL PROVIDE LBRACE UIDENT AS YIELD
+program: MODULE UIDENT EOL PROVIDE LBRACE MODULE UIDENT AS YIELD
 ##
 ## Ends in an error in state: 50.
 ##
 ## as_prefix(uid) -> AS . uid [ RBRACE EOL COMMA ]
+## as_prefix(uid) -> AS . eols uid [ RBRACE EOL COMMA ]
 ##
 ## The known suffix of the stack is as follows:
 ## AS
@@ -508,7 +538,7 @@ program: MODULE UIDENT EOL PROVIDE LBRACE LIDENT COMMA YIELD
 ## In state 63, spurious reduction of production comma -> COMMA
 ##
 
-Expected more items to provide or `}` to end the provide statement.
+Expected a lowercase identifier to provide a value, the keyword `module` followed by an uppercase identifier to provide a module, the keyword `type` followed by an uppercase identifier to provide a type, or `}` to end the provide statement.
 
 program: MODULE UIDENT EOL PROVIDE LBRACE YIELD
 ##
@@ -526,7 +556,7 @@ program: MODULE UIDENT EOL PROVIDE LBRACE YIELD
 ## In state 31, spurious reduction of production lbrace -> LBRACE
 ##
 
-Expected a comma-separated list of items to provide.
+Expected a lowercase identifier to provide a value, the keyword `module` followed by an uppercase identifier to provide a module, or the keyword `type` followed by an uppercase identifier to provide a type.
 
 program: MODULE UIDENT EOL PROVIDE LBRACE TYPE YIELD
 ##
@@ -539,6 +569,18 @@ program: MODULE UIDENT EOL PROVIDE LBRACE TYPE YIELD
 ##
 
 Expected a type identifier to provide.
+
+program: MODULE UIDENT EOL PROVIDE LBRACE EXCEPTION YIELD
+##
+## Ends in an error in state: 825.
+##
+## provide_item -> EXCEPTION . aliasable(uid) [ RBRACE EOL COMMA ]
+##
+## The known suffix of the stack is as follows:
+## EXCEPTION
+##
+
+Expected an exception identifier to provide.
 
 program: MODULE UIDENT EOL FROM UIDENT USE LBRACE LIDENT AS LIDENT YIELD
 ##
@@ -594,7 +636,7 @@ program: MODULE UIDENT EOL FROM UIDENT USE LBRACE LIDENT COMMA YIELD
 ## In state 63, spurious reduction of production comma -> COMMA
 ##
 
-Expected more items to use or `}` to end the statement.
+Expected a lowercase identifier to use a value, the keyword `module` followed by an uppercase identifier to use a module, the keyword `type` followed by an uppercase identifier to use a type, or `}` to end the use statement.
 
 program: MODULE UIDENT EOL ASSERT WHEN
 ##
@@ -790,34 +832,38 @@ program: MODULE UIDENT EOL ENUM UIDENT LBRACE UIDENT LPAREN WHILE
 
 Expected one or more types to complete the variant definition.
 
-program: MODULE UIDENT EOL ENUM UIDENT LBRACE UIDENT RBRACE COMMA EOL WHILE
+program: MODULE UIDENT EOL TYPE UIDENT EQUAL UIDENT AND YIELD
 ##
-## Ends in an error in state: 986.
+## Ends in an error in state: 860.
 ##
-## separated_nonempty_list(comma,data_declaration_stmt) -> data_declaration_stmt comma . separated_nonempty_list(comma,data_declaration_stmt) [ SEMI EOL EOF ]
+## separated_nonempty_list(AND,data_declaration_stmt) -> data_declaration_stmt AND . separated_nonempty_list(AND,data_declaration_stmt) [ SEMI RBRACE EOL EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## data_declaration_stmt comma
+## data_declaration_stmt AND
 ##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
-## In state 5, spurious reduction of production eols -> nonempty_list(eol)
-## In state 96, spurious reduction of production comma -> COMMA eols
+program: MODULE UIDENT EOL TYPE UIDENT EQUAL UIDENT AND PROVIDE YIELD
 ##
-program: MODULE UIDENT EOL ENUM UIDENT LBRACE UIDENT RBRACE COMMA PROVIDE WHILE
+## Ends in an error in state: 861.
 ##
-## Ends in an error in state: 987.
-##
-## data_declaration_stmt -> PROVIDE . data_declaration [ SEMI EOL EOF COMMA ]
+## data_declaration_stmt -> PROVIDE . data_declaration [ SEMI RBRACE EOL EOF AND ]
 ##
 ## The known suffix of the stack is as follows:
 ## PROVIDE
 ##
 
-Mutually recursive type declarations are separated by commas, but cannot be mixed with other kinds of expressions.
+Mutually recursive type declarations are separated by `and`, but cannot be mixed with other kinds of expressions.
+
+program: MODULE UIDENT EOL TYPE REC YIELD
+##
+## Ends in an error in state: 744.
+##
+## data_declaration -> TYPE option(rec_flag) . UIDENT option(id_vec) equal typ [ SEMI RBRACE EOL EOF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## TYPE option(rec_flag)
+##
+
+Expected a capitalized type name.
 
 program: MODULE UIDENT EOL ENUM UIDENT LBRACE UIDENT WHILE
 ##
@@ -861,7 +907,7 @@ program: MODULE UIDENT EOL ENUM UIDENT LBRACE UIDENT RBRACE WHILE
 ## data_declaration_stmt
 ##
 
-Expected a comma followed by more mutually-recursive type declarations or a newline character to complete the current one.
+Expected `and` followed by more mutually-recursive type declarations or a newline character to complete the current one.
 
 program: MODULE UIDENT EOL ENUM UIDENT LCARET LIDENT RCARET INFIX_80
 ##
@@ -907,6 +953,18 @@ program: MODULE UIDENT EOL ENUM WHILE
 ##
 ## The known suffix of the stack is as follows:
 ## ENUM
+##
+
+Expected `rec` or a capitalized name for the enum declaration.
+
+program: MODULE UIDENT EOL ENUM REC YIELD
+##
+## Ends in an error in state: 805.
+##
+## data_declaration -> ENUM option(rec_flag) . UIDENT option(id_vec) data_constructors [ SEMI RBRACE EOL EOF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## ENUM option(rec_flag)
 ##
 
 Expected a capitalized name for the enum declaration.
@@ -2868,7 +2926,7 @@ program: MODULE UIDENT EOL UIDENT LPAREN COMMA WHILE
 ## In state 43, spurious reduction of production comma -> COMMA
 ## In state 275, spurious reduction of production option(comma) -> comma
 ##
-program: MODULE UIDENT EOL UIDENT LPAREN UIDENT ARROW
+program: MODULE UIDENT EOL UIDENT LPAREN UIDENT THICKARROW
 ##
 ## Ends in an error in state: 473.
 ##
@@ -3308,7 +3366,7 @@ program: MODULE UIDENT EOL LBRACE BREAK RBRACE LBRACK WASMI64 THICKARROW
 ## In state 243, spurious reduction of production non_stmt_expr -> annotated_expr
 ## In state 62, spurious reduction of production expr -> non_stmt_expr
 ##
-program: MODULE UIDENT EOL PREFIX_150 LBRACK RBRACK LBRACK BIGINT ARROW
+program: MODULE UIDENT EOL PREFIX_150 LBRACK RBRACK LBRACK BIGINT THICKARROW
 ##
 ## Ends in an error in state: 560.
 ##
@@ -3404,7 +3462,7 @@ program: MODULE UIDENT EOL LBRACE LIDENT COMMA EOL LIDENT COLON BREAK WHILE
 ## The known suffix of the stack is as follows:
 ## punned_record_field comma lseparated_nonempty_list_inner(comma,record_field)
 ##
-program: MODULE UIDENT EOL LBRACE ELLIPSIS BIGINT COMMA ELLIPSIS BIGINT ARROW
+program: MODULE UIDENT EOL LBRACE ELLIPSIS BIGINT COMMA ELLIPSIS BIGINT THICKARROW
 ##
 ## Ends in an error in state: 227.
 ##
@@ -3431,7 +3489,7 @@ program: MODULE UIDENT EOL LBRACE ELLIPSIS BIGINT COMMA ELLIPSIS BIGINT ARROW
 
 Expected a comma followed by more record fields or an immediate `}` to complete the record expression.
 
-program: MODULE UIDENT EOL UIDENT LBRACE ELLIPSIS UIDENT ARROW
+program: MODULE UIDENT EOL UIDENT LBRACE ELLIPSIS UIDENT THICKARROW
 ##
 ## Ends in an error in state: 488.
 ##
@@ -3519,7 +3577,7 @@ program: MODULE UIDENT EOL LBRACE LIDENT COMMA LIDENT COMMA EOL WHILE
 
 Expected more record fields or an immediate `}` to complete the record expression.
 
-program: MODULE UIDENT EOL LBRACE ELLIPSIS BIGINT ARROW
+program: MODULE UIDENT EOL LBRACE ELLIPSIS BIGINT THICKARROW
 ##
 ## Ends in an error in state: 222.
 ##
@@ -4386,7 +4444,7 @@ program: MODULE UIDENT EOL LET UIDENT DOT EOL WHILE
 ##
 ## Ends in an error in state: 92.
 ##
-## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT eols . type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS ARROW ]
+## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT eols . type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## lseparated_nonempty_list_inner(dot,type_id_str) DOT eols
@@ -4402,8 +4460,8 @@ program: MODULE UIDENT EOL LET UIDENT DOT WHILE
 ##
 ## Ends in an error in state: 90.
 ##
-## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT . type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS ARROW ]
-## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT . eols type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS ARROW ]
+## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT . type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS THICKARROW ]
+## lseparated_nonempty_list_inner(dot,type_id_str) -> lseparated_nonempty_list_inner(dot,type_id_str) DOT . eols type_id_str [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LPAREN LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DOT DASH COMMA COLON AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## lseparated_nonempty_list_inner(dot,type_id_str) DOT
@@ -4449,22 +4507,14 @@ program: MODULE UIDENT EOL LET UIDENT LPAREN WHILE
 
 Expected a comma-separated list of patterns.
 
-program: MODULE UIDENT EOL LET WASMI64 EQUAL WASMI64 COMMA EOL WHILE
+program: MODULE UIDENT EOL LET NUMBER_INT EQUAL UIDENT AND YIELD
 ##
-## Ends in an error in state: 433.
+## Ends in an error in state: 423.
 ##
-## lseparated_nonempty_list_inner(comma,value_bind) -> lseparated_nonempty_list_inner(comma,value_bind) comma . value_bind [ SEMI RBRACE EOL EOF COMMA ]
+## lseparated_nonempty_list_inner(AND,value_bind) -> lseparated_nonempty_list_inner(AND,value_bind) AND . value_bind [ SEMI RBRACE EOL EOF AND ]
 ##
 ## The known suffix of the stack is as follows:
-## lseparated_nonempty_list_inner(comma,value_bind) comma
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
-## In state 5, spurious reduction of production eols -> nonempty_list(eol)
-## In state 96, spurious reduction of production comma -> COMMA eols
+## lseparated_nonempty_list_inner(AND,value_bind) AND
 ##
 
 Expected a binding, e.g. `foo = 5`.
@@ -4595,7 +4645,7 @@ program: MODULE UIDENT EOL LPAREN WASMI64 EOL WHILE
 ##
 ## Ends in an error in state: 113.
 ##
-## rparen -> eols . RPAREN [ WHILE WHEN WASMI64 WASMI32 WASMF64 WASMF32 VOID UIDENT TYPE TRUE THROW THICKARROW STRING STAR SLASH SEMI RPAREN RECORD RCARET RBRACK RBRACE PREFIX_150 PIPE NUMBER_INT NUMBER_FLOAT MATCH LPAREN LIDENT LET LCARET LBRACKRCARET LBRACK LBRACE INT64 INT32 INFIX_ASSIGNMENT_10 INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 INCLUDE IF GETS FUN FROM FOR FLOAT64 FLOAT32 FALSE FAIL PROVIDE EQUAL EOL EOF ENUM ELSE DOT DASH CONTINUE COMMA COLON CHAR BREAK BIGINT AT ASSERT AS ARROW ]
+## rparen -> eols . RPAREN [ WHILE WHEN WASMI64 WASMI32 WASMF64 WASMF32 VOID UIDENT TYPE TRUE THROW THICKARROW STRING STAR SLASH SEMI RPAREN RECORD RCARET RBRACK RBRACE PREFIX_150 PIPE NUMBER_INT NUMBER_FLOAT MATCH LPAREN LIDENT LET LCARET LBRACKRCARET LBRACK LBRACE INT64 INT32 INFIX_ASSIGNMENT_10 INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 INCLUDE IF GETS FUN FROM FOR FLOAT64 FLOAT32 FALSE FAIL PROVIDE EQUAL EOL EOF ENUM ELSE DOT DASH CONTINUE COMMA COLON CHAR BREAK BIGINT AT ASSERT AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## eols
@@ -5074,7 +5124,7 @@ program: MODULE UIDENT EOL RECORD UIDENT LCARET LIDENT EOL WHILE
 ##
 ## Ends in an error in state: 86.
 ##
-## rcaret -> eols . RCARET [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET LBRACE INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS ARROW ]
+## rcaret -> eols . RCARET [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET LBRACE INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## eols
@@ -5139,6 +5189,18 @@ program: MODULE UIDENT EOL RECORD WHILE
 ##
 ## The known suffix of the stack is as follows:
 ## RECORD
+##
+
+Expected `rec` or a capitalized name for the record type.
+
+program: MODULE UIDENT EOL RECORD REC YIELD
+##
+## Ends in an error in state: 759.
+##
+## data_declaration -> RECORD option(rec_flag) . UIDENT option(id_vec) data_record_body [ SEMI RBRACE EOL EOF COMMA ]
+##
+## The known suffix of the stack is as follows:
+## RECORD option(rec_flag)
 ##
 
 Expected a capitalized identifier for the record type.
@@ -5337,6 +5399,15 @@ program: MODULE UIDENT EOL LIDENT INFIX_ASSIGNMENT_10 WHEN
 ##
 ## The known suffix of the stack is as follows:
 ## id_expr assign_binop_op
+##
+program: MODULE UIDENT EOL UIDENT LBRACK UIDENT RBRACK INFIX_ASSIGNMENT_10 YIELD
+##
+## Ends in an error in state: 478.
+##
+## array_set -> left_accessor_expr lbrack expr rbrack assign_binop_op . expr [ THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 EOL EOF ELSE DASH COMMA COLON AND ]
+##
+## The known suffix of the stack is as follows:
+## left_accessor_expr lbrack expr rbrack assign_binop_op
 ##
 program: MODULE UIDENT EOL LIDENT EQUAL WHEN
 ##
@@ -5855,7 +5926,7 @@ program: MODULE UIDENT EOL WASMI64 COLON WHILE
 
 Expected a type to complete the type annotation.
 
-program: MODULE UIDENT EOL WASMI64 COLON FUN LIDENT ARROW EOL WHILE
+program: MODULE UIDENT EOL WASMI64 COLON FUN LIDENT THICKARROW EOL WHILE
 ##
 ## Ends in an error in state: 78.
 ##
@@ -5870,9 +5941,9 @@ program: MODULE UIDENT EOL WASMI64 COLON FUN LIDENT ARROW EOL WHILE
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
 ## In state 5, spurious reduction of production eols -> nonempty_list(eol)
-## In state 77, spurious reduction of production arrow -> ARROW eols
+## In state 77, spurious reduction of production arrow -> THICKARROW eols
 ##
-program: MODULE UIDENT EOL WASMI64 COLON FUN LPAREN RPAREN ARROW EOL WHILE
+program: MODULE UIDENT EOL WASMI64 COLON FUN LPAREN RPAREN THICKARROW EOL WHILE
 ##
 ## Ends in an error in state: 122.
 ##
@@ -5887,7 +5958,22 @@ program: MODULE UIDENT EOL WASMI64 COLON FUN LPAREN RPAREN ARROW EOL WHILE
 ## may provide an INCOMPLETE view of the future (what was expected next).
 ## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
 ## In state 5, spurious reduction of production eols -> nonempty_list(eol)
-## In state 77, spurious reduction of production arrow -> ARROW eols
+## In state 77, spurious reduction of production arrow -> THICKARROW eols
+##
+program: MODULE UIDENT EOL UIDENT COLON FUN UIDENT THICKARROW YIELD
+##
+## Ends in an error in state: 217.
+##
+## typ -> FUN data_typ thickarrow . typ [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS AND ]
+##
+## The known suffix of the stack is as follows:
+## FUN data_typ thickarrow
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 37, spurious reduction of production thickarrow -> THICKARROW
 ##
 
 Expected a type for the result of the function type.
@@ -6075,31 +6161,31 @@ program: MODULE UIDENT EOL WASMI64 COLON LPAREN UIDENT WHEN
 
 Expected `)` for a grouped type or a comma followed by more types for a tuple type.
 
-program: MODULE UIDENT EOL WASMI64 COLON UIDENT ARROW EOL WHILE
+program: MODULE UIDENT EOL UIDENT COLON FUN UIDENT YIELD
 ##
-## Ends in an error in state: 107.
+## Ends in an error in state: 216.
 ##
-## typ -> data_typ arrow . typ [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS ]
+## typ -> FUN data_typ . thickarrow typ [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS AND ]
 ##
 ## The known suffix of the stack is as follows:
-## data_typ arrow
+## FUN data_typ
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 3, spurious reduction of production nonempty_list(eol) -> EOL
-## In state 5, spurious reduction of production eols -> nonempty_list(eol)
-## In state 77, spurious reduction of production arrow -> ARROW eols
+## In state 106, spurious reduction of production qualified_uid -> lseparated_nonempty_list_inner(dot,type_id_str)
+## In state 167, spurious reduction of production data_typ -> qualified_uid
 ##
 
-Expected a type for the result of the function type.
+# This error can't appear as the FUN token wouldn't have been injected.
+Expected `=>` followed by the function type's result type.
 
 program: MODULE UIDENT EOL WASMI64 COLON UIDENT LCARET EOL WHILE
 ##
 ## Ends in an error in state: 82.
 ##
-## data_typ -> type_id lcaret . typs rcaret [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS ARROW ]
+## data_typ -> type_id lcaret . typs rcaret [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## type_id lcaret
@@ -6119,7 +6205,7 @@ program: MODULE UIDENT EOL WASMI64 COLON UIDENT LCARET UIDENT RPAREN
 ##
 ## Ends in an error in state: 83.
 ##
-## data_typ -> type_id lcaret typs . rcaret [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS ARROW ]
+## data_typ -> type_id lcaret typs . rcaret [ WHEN THICKARROW STAR SLASH SEMI RPAREN RCARET RBRACK RBRACE PIPE LCARET INFIX_90 INFIX_80 INFIX_70 INFIX_60 INFIX_50 INFIX_40 INFIX_30 INFIX_120 INFIX_110 INFIX_100 FROM EQUAL EOL EOF ELSE DASH COMMA COLON AS THICKARROW ]
 ##
 ## The known suffix of the stack is as follows:
 ## type_id lcaret typs

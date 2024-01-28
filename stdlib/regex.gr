@@ -21,7 +21,6 @@ include "map"
 include "option"
 include "result"
 include "string"
-include "float32"
 include "number"
 from Number use { min, max }
 
@@ -245,8 +244,8 @@ let rec rangeAdd = (rng: CharRange, v: CharRangeElt) => {
     _ when rangeContains(rng, v) => rng,
     _ => rangeUnion(rng, [(v, v)]),
   }
-},
-rangeUnion = (rng1, rng2) => {
+}
+and rangeUnion = (rng1, rng2) => {
   match ((rng1, rng2)) {
     ([], _) => rng2,
     (_, []) => rng1,
@@ -407,7 +406,7 @@ enum UnicodeCategory {
   OtherPrivateUse,
 }
 
-enum ParsedRegularExpression {
+enum rec ParsedRegularExpression {
   RENever,
   REEmpty,
   REAny,
@@ -469,14 +468,11 @@ enum ParsedRegularExpression {
 
 let needsBacktrack = (rx: ParsedRegularExpression) => {
   match (rx) {
-    REAlts(_, _) => true,
-    RESequence(_, nb) => nb,
-    REGroup(_, _) => true,
-    RERepeat(_, _, _, _) => true,
-    REMaybe(_, _) => true,
-    REConditional(_, _, _, _, _, nb) => nb,
-    RECut(_, _, _, nb) => nb,
-    REUnicodeCategories(_, _) => true,
+    REAlts(_, _) | REGroup(_, _) | RERepeat(_, _, _, _) | REMaybe(_, _) |
+    REUnicodeCategories(_, _) =>
+      true,
+    RESequence(_, nb) | REConditional(_, _, _, _, _, nb) | RECut(_, _, _, nb) =>
+      nb,
     _ => false,
   }
 }
@@ -503,8 +499,7 @@ let mergeAdjacent = lst => {
           None => false,
           Some(MMChar) => {
             match (hd) {
-              RELiteral(x) => false,
-              RELiteralString(x) => false,
+              RELiteral(_) | RELiteralString(_) => false,
               _ => true,
             }
           },
@@ -517,9 +512,7 @@ let mergeAdjacent = lst => {
       // flatten nested sequences
       [RESequence(rxs1, _), ...tl] => loop(mode, accum, List.append(rxs1, tl)),
       // drop empty elements
-      [REEmpty, ...tl] => loop(mode, accum, tl),
-      [RELiteralString(""), ...tl] => loop(mode, accum, tl),
-      // TODO(#696): Clean up with or-patterns
+      [REEmpty, ...tl] | [RELiteralString(""), ...tl] => loop(mode, accum, tl),
       _ when readyForAccum(l, mode) => {
         match (accum) {
           [] => [],
@@ -643,8 +636,8 @@ let rec parseRangeNot = (buf: RegExBuf) => {
       Ok(_) => parseRange(buf),
     }
   }
-},
-parseRange = (buf: RegExBuf) => {
+}
+and parseRange = (buf: RegExBuf) => {
   if (!more(buf)) {
     Err(parseErr(buf, "Missing closing `]`", 0))
   } else {
@@ -667,8 +660,8 @@ parseRange = (buf: RegExBuf) => {
       Ok(_) => parseRangeRest(buf, [], None, None),
     }
   }
-},
-parseClass = (buf: RegExBuf) => {
+}
+and parseClass = (buf: RegExBuf) => {
   if (!more(buf)) {
     Err(
       "no chars"
@@ -703,8 +696,8 @@ parseClass = (buf: RegExBuf) => {
       Ok(c) => Err("unknown class: " ++ toString(c)),
     }
   }
-},
-parsePosixCharClass = (buf: RegExBuf) => {
+}
+and parsePosixCharClass = (buf: RegExBuf) => {
   if (!more(buf)) {
     Err(parseErr(buf, "Missing POSIX character class after `[`", 0))
   } else {
@@ -820,8 +813,8 @@ parsePosixCharClass = (buf: RegExBuf) => {
         ),
     }
   }
-},
-parseRangeRest =
+}
+and parseRangeRest =
   (
     buf: RegExBuf,
     rng: CharRange,
@@ -973,8 +966,8 @@ parseRangeRest =
       },
     }
   }
-},
-parseRangeRestSpan =
+}
+and parseRangeRestSpan =
   (
     buf: RegExBuf,
     c,
@@ -1223,8 +1216,8 @@ let rec parseAtom = (buf: RegExBuf) => {
         _ => parseLiteral(buf),
       },
   }
-},
-parseLook = (buf: RegExBuf) => {
+}
+and parseLook = (buf: RegExBuf) => {
   let preNumGroups = unbox(buf.config.groupNumber)
   let spanNumGroups = () => unbox(buf.config.groupNumber) - preNumGroups
   // (isMatch, isAhead)
@@ -1290,8 +1283,8 @@ parseLook = (buf: RegExBuf) => {
       }
     },
   }
-},
-parseTest = (buf: RegExBuf) => {
+}
+and parseTest = (buf: RegExBuf) => {
   if (!more(buf)) {
     Err(parseErr(buf, "Expected test", 0))
   } else {
@@ -1328,8 +1321,8 @@ parseTest = (buf: RegExBuf) => {
         ),
     }
   }
-},
-parseInteger = (buf: RegExBuf, n) => {
+}
+and parseInteger = (buf: RegExBuf, n) => {
   if (!more(buf)) {
     Ok(n)
   } else {
@@ -1344,8 +1337,8 @@ parseInteger = (buf: RegExBuf, n) => {
       Ok(_) => Ok(n),
     }
   }
-},
-parseMode = (buf: RegExBuf) => {
+}
+and parseMode = (buf: RegExBuf) => {
   let processState = ((cs, ml)) => {
     let withCs = match (cs) {
       None => buf.config,
@@ -1404,8 +1397,8 @@ parseMode = (buf: RegExBuf) => {
     }
   }
   help((None, None))
-},
-parseUnicodeCategories = (buf: RegExBuf, pC: String) => {
+}
+and parseUnicodeCategories = (buf: RegExBuf, pC: String) => {
   if (!more(buf)) {
     Err(parseErr(buf, "Expected unicode category", 0))
   } else {
@@ -1573,8 +1566,8 @@ parseUnicodeCategories = (buf: RegExBuf, pC: String) => {
       Ok(_) => Err(parseErr(buf, "Expected `{` after `\\" ++ pC ++ "`", 0)),
     }
   }
-},
-parseLiteral = (buf: RegExBuf) => {
+}
+and parseLiteral = (buf: RegExBuf) => {
   if (!more(buf)) {
     Err(parseErr(buf, "Expected literal", 0))
   } else {
@@ -1608,8 +1601,8 @@ parseLiteral = (buf: RegExBuf) => {
       },
     }
   }
-},
-parseBackslashLiteral = (buf: RegExBuf) => {
+}
+and parseBackslashLiteral = (buf: RegExBuf) => {
   if (!more(buf)) {
     // Special case: EOS after backslash matches null
     Err(parseErr(buf, "Expected to find escaped value after backslash", 0))
@@ -1672,8 +1665,8 @@ parseBackslashLiteral = (buf: RegExBuf) => {
       },
     }
   }
-},
-parseNonGreedy = (buf: RegExBuf) => {
+}
+and parseNonGreedy = (buf: RegExBuf) => {
   let checkNotNested = res => {
     if (!more(buf)) {
       res
@@ -1699,8 +1692,8 @@ parseNonGreedy = (buf: RegExBuf) => {
       Ok(_) => checkNotNested(Ok(false)),
     }
   }
-},
-parsePCE = (buf: RegExBuf) => {
+}
+and parsePCE = (buf: RegExBuf) => {
   match (parseAtom(buf)) {
     Err(e) => Err(e),
     Ok(atom) => {
@@ -1794,8 +1787,8 @@ parsePCE = (buf: RegExBuf) => {
       }
     },
   }
-},
-parsePCEs = (buf: RegExBuf, toplevel: Bool) => {
+}
+and parsePCEs = (buf: RegExBuf, toplevel: Bool) => {
   if (!more(buf)) {
     Ok([])
   } else {
@@ -1821,8 +1814,8 @@ parsePCEs = (buf: RegExBuf, toplevel: Bool) => {
       },
     }
   }
-},
-parseRegex = (buf: RegExBuf) => {
+}
+and parseRegex = (buf: RegExBuf) => {
   if (!more(buf)) {
     Ok(REEmpty)
   } else {
@@ -1857,8 +1850,8 @@ parseRegex = (buf: RegExBuf) => {
       },
     }
   }
-},
-parseRegexNonEmpty = (buf: RegExBuf) => {
+}
+and parseRegexNonEmpty = (buf: RegExBuf) => {
   match (parsePCEs(buf, false)) {
     Err(e) => Err(e),
     Ok(pces) => {
@@ -1932,8 +1925,8 @@ let rec isAnchored = (re: ParsedRegularExpression) => {
           [] => false,
           [hd, ...tl] => {
             match (hd) {
-              RELookahead(_, _, _, _) => loop(tl),
-              RELookbehind(_, _, _, _, _, _) => loop(tl),
+              RELookahead(_, _, _, _) | RELookbehind(_, _, _, _, _, _) =>
+                loop(tl),
               _ => isAnchored(hd),
             }
           },
@@ -1987,15 +1980,11 @@ let rec mustString = (re: ParsedRegularExpression) => {
 
 let rec zeroSized = re => {
   match (re) {
-    REEmpty => true,
-    REStart => true,
-    RELineStart => true,
-    REWordBoundary => true,
-    RENotWordBoundary => true,
-    RELookahead(_, _, _, _) => true,
-    RELookbehind(_, _, _, _, _, _) => true,
-    REGroup(re, _) => zeroSized(re),
-    RECut(re, _, _, _) => zeroSized(re),
+    REEmpty | REStart | RELineStart | REWordBoundary | RENotWordBoundary |
+    RELookahead(_, _, _, _) |
+    RELookbehind(_, _, _, _, _, _) =>
+      true,
+    REGroup(re, _) | RECut(re, _, _, _) => zeroSized(re),
     _ => false,
   }
 }
@@ -2094,21 +2083,13 @@ let rec validate = (re: ParsedRegularExpression, numGroups) => {
   }
   let rec loop = re => {
     match (re) {
-      RENever => (1, 1, 0),
-      REAny => (1, 1, 0),
-      RELiteral(_) => (1, 1, 0),
-      RERange(_) => (1, 1, 0),
+      RENever | REAny | RELiteral(_) | RERange(_) => (1, 1, 0),
       RELiteralString(s) => {
         let ls = String.length(s)
         (ls, ls, 0)
       },
-      REEmpty => (0, 0, 0),
-      REEnd => (0, 0, 0),
-      RELineEnd => (0, 0, 0),
-      REStart => (0, 0, 1),
-      RELineStart => (0, 0, 1),
-      REWordBoundary => (0, 0, 1),
-      RENotWordBoundary => (0, 0, 1),
+      REEmpty | REEnd | RELineEnd => (0, 0, 0),
+      REStart | RELineStart | REWordBoundary | RENotWordBoundary => (0, 0, 1),
       REAlts(re1, re2) => {
         let (min1, max1, maxL1) = loop(re1)
         let (min2, max2, maxL2) = loop(re2)
@@ -2138,7 +2119,7 @@ let rec validate = (re: ParsedRegularExpression, numGroups) => {
           mustSizes = mergeDependsSizes(oldMustSizes, mustSizes)
           dependsSizes = mergeDependsSizes(oldDependsSizes, dependsSizes)
           let repeatMax = match (repeatMax) {
-            None => Float32.toNumber(Float32.infinity),
+            None => Infinity,
             Some(n) => n,
           }
           (min1 * repeatMin, max1 * repeatMax, maxL1)
@@ -2164,7 +2145,7 @@ let rec validate = (re: ParsedRegularExpression, numGroups) => {
       },
       RELookbehind(re, _, lbMin, lbMax, _, _) => {
         let (min1, max1, maxL1) = loop(re)
-        if (max1 == Float32.toNumber(Float32.infinity)) {
+        if (max1 == Infinity) {
           thrownError = Some(DoesNotMatchBounded)
           (0, 0, 0)
         } else {
@@ -2173,19 +2154,17 @@ let rec validate = (re: ParsedRegularExpression, numGroups) => {
           (0, 0, max(max1, maxL1))
         }
       },
-      RECut(re, _, _, _) => {
-        loop(re)
-      },
+      RECut(re, _, _, _) => loop(re),
       REReference(n, _) => {
         if (n > numGroups) {
           thrownError = Some(BackreferenceTooBig)
           (0, 0, 0)
         } else {
           match (Map.get(n, groupSizes)) {
-            Some(minSize) => (minSize, Float32.toNumber(Float32.infinity), 0),
+            Some(minSize) => (minSize, Infinity, 0),
             None => {
               Map.set(n - 1, true, dependsSizes)
-              (1, Float32.toNumber(Float32.infinity), 0)
+              (1, Infinity, 0)
             },
           }
         }
@@ -2246,7 +2225,7 @@ let matchBufChar = (buf: MatchBuf, pos: Number) => {
 }
 
 enum StackElt {
-  SEPositionProducer(Number -> Option<Number>),
+  SEPositionProducer(Number => Option<Number>),
   SESavedGroup(Number, Option<(Number, Number)>),
 }
 
@@ -3328,7 +3307,7 @@ abstract record RegularExpression {
     Number,
     Array<Option<(Number, Number)>>,
     List<StackElt>,
-  ) -> Option<Number>,
+  ) => Option<Number>,
   reMustString: Option<String>,
   reIsAnchored: Bool,
   reStartRange: Option<RERange>,
@@ -3586,14 +3565,14 @@ let searchMatch =
  * the following accessors:
  *
  * ```grain
- * group : Number -> Option<String>
+ * group : Number => Option<String>
  * ```
  *
  * Returns the contents of the given group. Note that group 0 contains
  * the entire matched substring, and group 1 contains the first parenthesized group.
  *
  * ```grain
- * groupPosition : Number -> Option<(Number, Number)>
+ * groupPosition : Number => Option<(Number, Number)>
  * ```
  *
  * Returns the position of the given group.
@@ -3605,13 +3584,13 @@ let searchMatch =
  * The number of defined groups in this match object (including group 0).
  *
  * ```grain
- * allGroups : () -> Array<Option<String>>
+ * allGroups : () => Array<Option<String>>
  * ```
  *
  * Returns the contents of all groups matched in this match object.
  *
  * ```grain
- * allGroupPositions : () -> Array<Option<(Number, Number)>>
+ * allGroupPositions : () => Array<Option<(Number, Number)>>
  * ```
  *
  * Returns the positions of all groups matched in this match object.
@@ -3622,11 +3601,11 @@ provide record MatchResult {
   /**
    * Returns the contents of the given group
    */
-  group: Number -> Option<String>,
+  group: Number => Option<String>,
   /**
    * Returns the position of the given group
    */
-  groupPosition: Number -> Option<(Number, Number)>,
+  groupPosition: Number => Option<(Number, Number)>,
   /**
    * Returns the number of defined groups in this match object (includes group 0)
    */
@@ -3634,11 +3613,11 @@ provide record MatchResult {
   /**
    * Returns the contents of all groups matched in this match object
    */
-  allGroups: () -> Array<Option<String>>,
+  allGroups: () => Array<Option<String>>,
   /**
    * Returns the positions of all groups matched in this match object
    */
-  allGroupPositions: () -> Array<Option<(Number, Number)>>,
+  allGroupPositions: () => Array<Option<(Number, Number)>>,
 }
 
 let makeMatchResult = (origString, start, end, state) => {

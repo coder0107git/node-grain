@@ -50,7 +50,8 @@ type error =
   | Scoping_pack(Identifier.t, type_expr)
   | Recursive_module_require_explicit_type
   | Apply_generative
-  | Cannot_scrape_alias(Path.t);
+  | Cannot_scrape_alias(Path.t)
+  | Nonrecursive_type_with_recursion(Identifier.t);
 
 exception Error(Location.t, Env.t, error);
 exception Error_forward(Location.error);
@@ -393,11 +394,35 @@ let rec type_module = (~toplevel=false, anchor, env, statements) => {
   };
 
   let process_datas = (env, data_decls, attributes, loc) => {
+    // A well-formedness check would have detected issues with improper use of
+    // `rec` on mutually-recursive types
+    let rec_flag =
+      switch (data_decls) {
+      | [(_, {pdata_rec: Recursive}), ..._] => Recursive
+      | _ => Nonrecursive
+      };
     let (decls, newenv) =
-      Typedecl.transl_data_decl(env, Recursive, data_decls);
+      try(Typedecl.transl_data_decl(env, rec_flag, data_decls)) {
+      | Typetexp.Error(_, _, Typetexp.Unbound_type_constructor(_)) =>
+        // Hack to detect if `rec` should be included on this type: if it does
+        // not raise an exception in `Recursive` mode but does otherwise,
+        // suggest that `rec` be used
+        switch (Typedecl.transl_data_decl(env, Recursive, data_decls)) {
+        | exception exn => raise(exn)
+        | _ =>
+          let (_, {pdata_name: type_name}) = List.hd(data_decls);
+          raise(
+            Error(
+              loc,
+              env,
+              Nonrecursive_type_with_recursion(IdentName(type_name)),
+            ),
+          );
+        }
+      };
     let ty_decls =
       map2_rec_type_with_row_types(
-        ~rec_flag=Recursive,
+        ~rec_flag,
         (rs, info, e) => {
           switch (e) {
           | NotProvided => None
@@ -627,19 +652,28 @@ let rec type_module = (~toplevel=false, anchor, env, statements) => {
             ],
           );
         | PProvideType({name: {txt: IdentName(name)}, alias, loc}) =>
-          let (type_id, _) = Typetexp.find_type(env, loc, IdentName(name));
-          switch (alias) {
-          | Some({txt: IdentName(alias)}) =>
-            type_export_aliases :=
-              [
-                (type_id, PIdent(Ident.create(alias.txt))),
-                ...type_export_aliases^,
-              ]
-          | Some(_) => failwith("Impossible: invalid alias")
-          | None => ()
-          };
-          let type_ = Env.find_type(type_id, env);
-          ([TSigType(Path.head(type_id), type_, TRecNot), ...sigs], stmts);
+          let (type_path, type_) =
+            Typetexp.find_type(env, loc, IdentName(name));
+          let id =
+            switch (alias) {
+            | Some({txt: IdentName(alias)}) =>
+              let id = Ident.create(alias.txt);
+              type_export_aliases :=
+                [(type_path, PIdent(id)), ...type_export_aliases^];
+              id;
+            | Some(_) => failwith("Impossible: invalid alias")
+            | None => Ident.create(name.txt)
+            };
+          ([TSigType(id, type_, TRecNot), ...sigs], stmts);
+        | PProvideException({name: {txt: IdentName(name)}, alias, loc}) =>
+          let ext = Typetexp.find_exception(env, loc, IdentName(name));
+          let id =
+            switch (alias) {
+            | Some({txt: IdentName(alias)}) => Ident.create(alias.txt)
+            | Some(_) => failwith("Impossible: invalid alias")
+            | None => Ident.create(name.txt)
+            };
+          ([TSigTypeExt(id, ext, TExtException), ...sigs], stmts);
         | PProvideModule({name: {txt: IdentName(name)}, alias, loc}) =>
           let (mod_path, mod_decl) =
             Typetexp.find_module(env, loc, IdentName(name));
@@ -658,15 +692,7 @@ let rec type_module = (~toplevel=false, anchor, env, statements) => {
                       {tex_id: id, tex_path: path, tex_loc: val_loc},
                       ...provided_values^,
                     ];
-                  // If this module was imported, we'll set the internal path
-                  // to be picked up later to be re-exported. Otherwise, these
-                  // values originated in this module.
-                  let val_internalpath =
-                    switch (mod_decl.md_filepath) {
-                    | Some(_) => path
-                    | _ => val_internalpath
-                    };
-                  TSigValue(id, {...vd, val_internalpath});
+                  TSigValue(id, {...vd, val_internalpath: path});
                 | TSigModule(
                     id,
                     {md_type: TModSignature(signature)} as md,
@@ -909,7 +935,11 @@ let rec type_module = (~toplevel=false, anchor, env, statements) => {
       switch (get_alias(type_export_aliases^, PIdent(id))) {
       | None => TSigType(id, resolve_type_decl(decl), rs)
       | Some((name, alias)) =>
-        TSigType(Path.head(alias), resolve_type_decl(decl), rs)
+        TSigType(
+          Ident.create(Path.last(alias)),
+          resolve_type_decl(decl),
+          rs,
+        )
       }
     | TSigValue(id, {val_type, val_kind} as vd) =>
       let val_kind =
@@ -1013,7 +1043,7 @@ let type_implementation = prog => {
   let initenv = initial_env();
   let (statements, sg, finalenv) = type_module(initenv, prog.statements);
   let simple_sg = simplify_signature(sg);
-  let filename = sourcefile; // TODO(1396): Don't use filepath as filename
+  let filename = sourcefile; // TODO(#1396): Don't use filepath as filename
 
   check_nongen_schemes(finalenv, simple_sg);
   let normalized_sig = normalize_signature(finalenv, simple_sg);
@@ -1180,7 +1210,14 @@ let report_error = ppf =>
   | Apply_generative =>
     fprintf(ppf, "This is a generative functor. It can only be applied to ()")
   | Cannot_scrape_alias(p) =>
-    fprintf(ppf, "This is an alias for module %a, which is missing", path, p);
+    fprintf(ppf, "This is an alias for module %a, which is missing", path, p)
+  | Nonrecursive_type_with_recursion(lid) =>
+    fprintf(
+      ppf,
+      "Unbound type constructor %a. Are you missing the `rec` keyword on this type?",
+      identifier,
+      lid,
+    );
 
 let report_error = (env, ppf, err) =>
   Printtyp.wrap_printing_env(~error=true, env, () => report_error(ppf, err));

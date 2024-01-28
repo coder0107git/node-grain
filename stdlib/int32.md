@@ -25,7 +25,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromNumber : (x: Number) -> Int32
+fromNumber : (number: Number) => Int32
 ```
 
 Converts a Number to an Int32.
@@ -50,7 +50,7 @@ No other changes yet.
 </details>
 
 ```grain
-toNumber : (x: Int32) -> Number
+toNumber : (value: Int32) => Number
 ```
 
 Converts an Int32 to a Number.
@@ -75,7 +75,7 @@ No other changes yet.
 </details>
 
 ```grain
-fromUint32 : (x: Uint32) -> Int32
+fromUint32 : (number: Uint32) => Int32
 ```
 
 Converts a Uint32 to an Int32.
@@ -100,7 +100,7 @@ No other changes yet.
 </details>
 
 ```grain
-incr : (value: Int32) -> Int32
+incr : (value: Int32) => Int32
 ```
 
 Increments the value by one.
@@ -125,7 +125,7 @@ No other changes yet.
 </details>
 
 ```grain
-decr : (value: Int32) -> Int32
+decr : (value: Int32) => Int32
 ```
 
 Decrements the value by one.
@@ -142,15 +142,22 @@ Returns:
 |----|-----------|
 |`Int32`|The decremented value|
 
-### Int32.**add**
+### Int32.**(+)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `add`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-add : (x: Int32, y: Int32) -> Int32
+(+) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the sum of its operands.
@@ -168,15 +175,22 @@ Returns:
 |----|-----------|
 |`Int32`|The sum of the two operands|
 
-### Int32.**sub**
+### Int32.**(-)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `sub`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-sub : (x: Int32, y: Int32) -> Int32
+(-) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the difference of its operands.
@@ -194,15 +208,22 @@ Returns:
 |----|-----------|
 |`Int32`|The difference of the two operands|
 
-### Int32.**mul**
+### Int32.**(*)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `mul`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-mul : (x: Int32, y: Int32) -> Int32
+(*) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the product of its operands.
@@ -220,15 +241,22 @@ Returns:
 |----|-----------|
 |`Int32`|The product of the two operands|
 
-### Int32.**div**
+### Int32.**(/)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `div`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-div : (x: Int32, y: Int32) -> Int32
+(/) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the quotient of its operands using signed division.
@@ -254,7 +282,7 @@ No other changes yet.
 </details>
 
 ```grain
-rem : (x: Int32, y: Int32) -> Int32
+rem : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the remainder of the division of its operands using signed division.
@@ -272,15 +300,22 @@ Returns:
 |----|-----------|
 |`Int32`|The remainder of its operands|
 
-### Int32.**mod**
+### Int32.**(%)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `mod`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-mod : (x: Int32, y: Int32) -> Int32
+(%) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the remainder of the division of the first operand by the second.
@@ -313,7 +348,7 @@ No other changes yet.
 </details>
 
 ```grain
-rotl : (value: Int32, amount: Int32) -> Int32
+rotl : (value: Int32, amount: Int32) => Int32
 ```
 
 Rotates the bits of the value left by the given number of bits.
@@ -339,7 +374,7 @@ No other changes yet.
 </details>
 
 ```grain
-rotr : (value: Int32, amount: Int32) -> Int32
+rotr : (value: Int32, amount: Int32) => Int32
 ```
 
 Rotates the bits of the value right by the given number of bits.
@@ -357,15 +392,22 @@ Returns:
 |----|-----------|
 |`Int32`|The rotated value|
 
-### Int32.**shl**
+### Int32.**(<<)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `shl`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-shl : (value: Int32, amount: Int32) -> Int32
+(<<) : (value: Int32, amount: Int32) => Int32
 ```
 
 Shifts the bits of the value left by the given number of bits.
@@ -383,15 +425,22 @@ Returns:
 |----|-----------|
 |`Int32`|The shifted value|
 
-### Int32.**shr**
+### Int32.**(>>)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `shr`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-shr : (value: Int32, amount: Int32) -> Int32
+(>>) : (value: Int32, amount: Int32) => Int32
 ```
 
 Shifts the bits of the value right by the given number of bits, preserving the sign bit.
@@ -409,15 +458,22 @@ Returns:
 |----|-----------|
 |`Int32`|The shifted value|
 
-### Int32.**eq**
+### Int32.**(==)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.4.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.4.0</code></td><td>Originally named `eq`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-eq : (x: Int32, y: Int32) -> Bool
+(==) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is equal to the second value.
@@ -435,15 +491,22 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is equal to the second value or `false` otherwise|
 
-### Int32.**ne**
+### Int32.**(!=)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.4.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.4.0</code></td><td>Originally named `ne`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-ne : (x: Int32, y: Int32) -> Bool
+(!=) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is not equal to the second value.
@@ -469,7 +532,7 @@ No other changes yet.
 </details>
 
 ```grain
-eqz : (value: Int32) -> Bool
+eqz : (value: Int32) => Bool
 ```
 
 Checks if the given value is equal to zero.
@@ -486,15 +549,22 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is equal to zero or `false` otherwise|
 
-### Int32.**lt**
+### Int32.**(<)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `lt`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-lt : (x: Int32, y: Int32) -> Bool
+(<) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is less than the second value.
@@ -512,15 +582,22 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than the second value or `false` otherwise|
 
-### Int32.**gt**
+### Int32.**(>)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `gt`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-gt : (x: Int32, y: Int32) -> Bool
+(>) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is greater than the second value.
@@ -538,15 +615,22 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is greater than the second value or `false` otherwise|
 
-### Int32.**lte**
+### Int32.**(<=)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `lte`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-lte : (x: Int32, y: Int32) -> Bool
+(<=) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is less than or equal to the second value.
@@ -564,15 +648,22 @@ Returns:
 |----|-----------|
 |`Bool`|`true` if the first value is less than or equal to the second value or `false` otherwise|
 
-### Int32.**gte**
+### Int32.**(>=)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `gte`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-gte : (x: Int32, y: Int32) -> Bool
+(>=) : (x: Int32, y: Int32) => Bool
 ```
 
 Checks if the first value is greater than or equal to the second value.
@@ -598,7 +689,7 @@ No other changes yet.
 </details>
 
 ```grain
-lnot : (value: Int32) -> Int32
+lnot : (value: Int32) => Int32
 ```
 
 Computes the bitwise NOT of the given value.
@@ -615,15 +706,22 @@ Returns:
 |----|-----------|
 |`Int32`|Containing the inverted bits of the given value|
 
-### Int32.**land**
+### Int32.**(&)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `land`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-land : (x: Int32, y: Int32) -> Int32
+(&) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the bitwise AND (`&`) on the given operands.
@@ -641,15 +739,22 @@ Returns:
 |----|-----------|
 |`Int32`|Containing a `1` in each bit position for which the corresponding bits of both operands are `1`|
 
-### Int32.**lor**
+### Int32.**(|)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `lor`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-lor : (x: Int32, y: Int32) -> Int32
+(|) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the bitwise OR (`|`) on the given operands.
@@ -667,15 +772,22 @@ Returns:
 |----|-----------|
 |`Int32`|Containing a `1` in each bit position for which the corresponding bits of either or both operands are `1`|
 
-### Int32.**lxor**
+### Int32.**(^)**
 
-<details disabled>
-<summary tabindex="-1">Added in <code>0.2.0</code></summary>
-No other changes yet.
+<details>
+<summary>Added in <code>next</code></summary>
+<table>
+<thead>
+<tr><th>version</th><th>changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0.2.0</code></td><td>Originally named `lxor`</td></tr>
+</tbody>
+</table>
 </details>
 
 ```grain
-lxor : (x: Int32, y: Int32) -> Int32
+(^) : (x: Int32, y: Int32) => Int32
 ```
 
 Computes the bitwise XOR (`^`) on the given operands.
@@ -701,7 +813,7 @@ No other changes yet.
 </details>
 
 ```grain
-clz : (value: Int32) -> Int32
+clz : (value: Int32) => Int32
 ```
 
 Counts the number of leading zero bits in the value.
@@ -726,7 +838,7 @@ No other changes yet.
 </details>
 
 ```grain
-ctz : (value: Int32) -> Int32
+ctz : (value: Int32) => Int32
 ```
 
 Counts the number of trailing zero bits in the value.
@@ -751,7 +863,7 @@ No other changes yet.
 </details>
 
 ```grain
-popcnt : (value: Int32) -> Int32
+popcnt : (value: Int32) => Int32
 ```
 
 Counts the number of bits set to `1` in the value, also known as a population count.
@@ -767,4 +879,30 @@ Returns:
 |type|description|
 |----|-----------|
 |`Int32`|The amount of 1-bits in its operand|
+
+### Int32.**(\*\*)**
+
+<details disabled>
+<summary tabindex="-1">Added in <code>next</code></summary>
+No other changes yet.
+</details>
+
+```grain
+(**) : (base: Int32, power: Int32) => Int32
+```
+
+Computes the exponentiation of the given base and power.
+
+Parameters:
+
+|param|type|description|
+|-----|----|-----------|
+|`base`|`Int32`|The base number|
+|`power`|`Int32`|The exponent number|
+
+Returns:
+
+|type|description|
+|----|-----------|
+|`Int32`|The base raised to the given power|
 

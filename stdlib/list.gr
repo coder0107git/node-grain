@@ -57,6 +57,21 @@ provide let length = list => {
 }
 
 /**
+ * Determines if the list contains no elements.
+ *
+ * @param list: The list to inspect
+ * @returns `true` if the list is empty and `false` otherwise
+ *
+ * @since v0.6.0
+ */
+provide let isEmpty = list => {
+  match (list) {
+    [] => true,
+    _ => false,
+  }
+}
+
+/**
  * Creates a new list with all elements in reverse order.
  *
  * @param list: The list to reverse
@@ -436,8 +451,8 @@ provide let rec flatten = list => {
 /**
  * Inserts a new value into a list at the specified index.
  *
- * @param value: The value to insert
  * @param index: The index to update
+ * @param value: The value to insert
  * @param list: The list to update
  * @returns The new list
  *
@@ -445,8 +460,9 @@ provide let rec flatten = list => {
  * @throws Failure(String): When `index` is more than 0 and greater than the list size
  *
  * @since v0.1.0
+ * @history v0.6.0: Swapped order of `index` and `value` parameters
  */
-provide let rec insert = (value, index, list) => {
+provide let rec insert = (index, value, list) => {
   if (index < 0) {
     fail "insert index cannot be a negative number"
   } else {
@@ -454,7 +470,7 @@ provide let rec insert = (value, index, list) => {
       [] => if (index == 0) [value] else fail "insert index is out-of-bounds",
       [first, ...rest] =>
         if (index == 0) [value, ...list]
-        else [first, ...insert(value, index - 1, rest)],
+        else [first, ...insert(index - 1, value, rest)],
     }
   }
 }
@@ -527,24 +543,24 @@ provide let part = (count, list) => {
  *
  * @history v0.6.0: No longer throws if `count` outside list length bounds
  */
-provide let rotate = (count, list) => {
-  // Optimization: only compute the list length (O(n)) if the count is negative
+provide let rotate = (n, list) => {
+  // Optimization: only compute the list length (O(n)) if n is negative
   // or if the entire list is exhausted when partitioning. This should improve
-  // performance if the list is very long but the count is small
+  // performance if the list is very long but n is small
   let getSplitI = () => {
     let len = length(list)
-    if (len == 0) 0 else count % len
+    if (len == 0) 0 else n % len
   }
-  let (beginning, end) = if (count >= 0) {
-    let rec iter = (list1, list2, count) => {
+  let (beginning, end) = if (n >= 0) {
+    let rec iter = (list1, list2, n) => {
       match (list2) {
-        [] => if (count > 0) None else Some((list1, list2)),
+        [] => if (n > 0) None else Some((list1, list2)),
         [first, ...rest] =>
-          if (count > 0) iter([first, ...list1], rest, count - 1)
+          if (n > 0) iter([first, ...list1], rest, n - 1)
           else Some((list1, list2)),
       }
     }
-    let res = iter([], list, count)
+    let res = iter([], list, n)
     match (res) {
       None => part(getSplitI(), list),
       Some((pt1, pt2)) => (reverse(pt1), pt2),

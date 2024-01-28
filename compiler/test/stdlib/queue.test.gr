@@ -47,6 +47,37 @@ assert Queue.pop(queue) == Some(1)
 assert Queue.pop(queue) == Some(2)
 assert Queue.pop(queue) == Some(3)
 assert Queue.pop(queue) == None
+let queue = Queue.makeSized(0)
+Queue.push(0, queue)
+let queue2 = Queue.makeSized(1)
+Queue.push(0, queue2)
+assert queue == queue2
+
+// Queue.toList
+let queue = Queue.makeSized(3)
+assert Queue.toList(queue) == []
+Queue.push(0, queue)
+Queue.push(1, queue)
+Queue.push(2, queue)
+Queue.push(3, queue)
+assert Queue.toList(queue) == [0, 1, 2, 3]
+Queue.pop(queue)
+assert Queue.toList(queue) == [1, 2, 3]
+Queue.push(3, queue)
+assert Queue.toList(queue) == [1, 2, 3, 3]
+Queue.pop(queue)
+Queue.push(4, queue)
+Queue.push(5, queue)
+assert Queue.toList(queue) == [2, 3, 3, 4, 5]
+
+// Queue.fromList
+let queue = Queue.makeSized(0)
+assert Queue.fromList([]) == queue
+Queue.push(0, queue)
+Queue.push(1, queue)
+Queue.push(2, queue)
+Queue.push(3, queue)
+assert Queue.fromList([0, 1, 2, 3]) == queue
 
 // test that the "circular" behavior of the circular queue works as expected
 let queue = Queue.makeSized(4)
@@ -82,8 +113,124 @@ assert Queue.pop(queue) == Some(9)
 assert Queue.pop(queue) == Some(10)
 assert Queue.pop(queue) == None
 
+// Queue.toArray
+let queue1 = Queue.make()
+assert Queue.toArray(queue1) == [>]
+let queue2 = Queue.make()
+Queue.push(1, queue2)
+Queue.push(2, queue2)
+Queue.push(3, queue2)
+Queue.push(4, queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.push(5, queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.push(6, queue2)
+Queue.push(7, queue2)
+Queue.push(8, queue2)
+Queue.push(9, queue2)
+Queue.push(10, queue2)
+Queue.push(11, queue2)
+Queue.push(12, queue2)
+Queue.push(13, queue2)
+Queue.push(14, queue2)
+Queue.push(15, queue2)
+Queue.push(16, queue2)
+Queue.push(17, queue2)
+Queue.push(18, queue2)
+Queue.push(19, queue2)
+assert Queue.toArray(queue2) ==
+  [> 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+let queue3 = Queue.make()
+Queue.push(1, queue3)
+Queue.push(2, queue3)
+Queue.push(3, queue3)
+assert Queue.toArray(queue3) == [> 1, 2, 3]
+let queue4 = Queue.copy(queue3)
+Queue.pop(queue4)
+assert Queue.toArray(queue4) == [> 2, 3]
+
+// Queue.fromArray
+let qa1 = Queue.makeSized(8)
+Queue.push(1, qa1)
+Queue.push(2, qa1)
+Queue.push(3, qa1)
+Queue.push(4, qa1)
+assert Queue.fromArray([> 1, 2, 3, 4]) == qa1
+assert Queue.fromArray([>]) == Queue.makeSized(16)
+
+// Queue.equal
+from Queue use { (==) }
+let queue1 = Queue.make()
+let queue2 = Queue.make()
+Queue.push(1, queue2)
+Queue.push(2, queue2)
+Queue.push(3, queue2)
+Queue.push(4, queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.push(5, queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.pop(queue2)
+Queue.push(6, queue2)
+Queue.push(7, queue2)
+Queue.push(8, queue2)
+Queue.push(9, queue2)
+Queue.push(10, queue2)
+Queue.push(11, queue2)
+Queue.push(12, queue2)
+Queue.push(13, queue2)
+Queue.push(14, queue2)
+Queue.push(15, queue2)
+Queue.push(16, queue2)
+Queue.push(17, queue2)
+Queue.push(18, queue2)
+Queue.push(19, queue2)
+let queue3 = Queue.make()
+Queue.push(1, queue3)
+Queue.push(2, queue3)
+Queue.push(3, queue3)
+let queue4 = Queue.copy(queue3)
+Queue.pop(queue4)
+let queue5 = Queue.make()
+Queue.push(6, queue5)
+Queue.push(7, queue5)
+Queue.push(8, queue5)
+Queue.push(9, queue5)
+Queue.push(10, queue5)
+Queue.push(11, queue5)
+Queue.push(12, queue5)
+Queue.push(13, queue5)
+Queue.push(14, queue5)
+Queue.push(15, queue5)
+Queue.push(16, queue5)
+Queue.push(17, queue5)
+Queue.push(18, queue5)
+Queue.push(19, queue5)
+assert queue2 == queue5
+let queue6 = Queue.make()
+Queue.push(1, queue6)
+Queue.push(2, queue6)
+Queue.push(3, queue6)
+assert queue3 == queue6
+let queue7 = Queue.make()
+Queue.push(2, queue7)
+Queue.push(3, queue7)
+assert queue4 == queue7
+let queue8 = Queue.make()
+Queue.push(1, queue8)
+Queue.pop(queue8)
+assert queue8 == queue1
+
+assert !(queue2 == queue3)
+assert !(queue5 == queue6)
+from Pervasives use { (==) }
+
 module Immutable {
-  from Queue use { Immutable as Queue }
+  from Queue use { module Immutable as Queue }
 
   // 1 <- 2 <- 3
   let sampleQueue = Queue.push(3, Queue.push(2, Queue.push(1, Queue.empty)))
@@ -116,4 +263,24 @@ module Immutable {
   assert Queue.size(Queue.empty) == 0
   assert Queue.size(sampleQueue) == 3
   assert Queue.size(Queue.pop(Queue.pop(sampleQueue))) == 1
+
+  // Queue.toList
+  let sampleQueue = Queue.push(3, Queue.push(2, Queue.push(1, Queue.empty)))
+  assert Queue.toList(Queue.empty) == []
+  assert Queue.toList(sampleQueue) == [1, 2, 3]
+  assert Queue.toList(Queue.pop(sampleQueue)) == [2, 3]
+
+  // Queue.fromList
+  assert Queue.fromList([]) == Queue.empty
+  let queue = Queue.fromList([1, 2, 3])
+  assert Queue.peek(sampleQueue) == Queue.peek(queue)
+  let queue = Queue.pop(queue)
+  let sampleQueue = Queue.pop(sampleQueue)
+  assert Queue.peek(sampleQueue) == Queue.peek(queue)
+  let queue = Queue.pop(queue)
+  let sampleQueue = Queue.pop(sampleQueue)
+  assert Queue.peek(sampleQueue) == Queue.peek(queue)
+  let queue = Queue.pop(queue)
+  let sampleQueue = Queue.pop(sampleQueue)
+  assert Queue.peek(sampleQueue) == Queue.peek(queue)
 }

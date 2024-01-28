@@ -19,7 +19,9 @@ type wferr =
   | ReturnStatementOutsideFunction(Location.t)
   | MismatchedReturnStyles(Location.t)
   | LocalIncludeStatement(Location.t)
-  | ProvidedMultipleTimes(string, Location.t);
+  | ProvidedMultipleTimes(string, Location.t)
+  | MutualRecTypesMissingRec(Location.t)
+  | MutualRecExtraneousNonfirstRec(Location.t);
 
 exception Error(wferr);
 
@@ -92,6 +94,16 @@ let prepare_error =
           "%s was provided multiple times, but can only be provided once.",
           name,
         )
+      | MutualRecTypesMissingRec(loc) =>
+        errorf(
+          ~loc,
+          "Mutually recursive type groups must include `rec` on the first type in the group.",
+        )
+      | MutualRecExtraneousNonfirstRec(loc) =>
+        errorf(
+          ~loc,
+          "The `rec` keyword should only appear on the first type in the mutually recursive type group.",
+        )
     )
   );
 
@@ -119,11 +131,23 @@ let malformed_strings = (errs, super) => {
     super.enter_expression(e);
   };
 
+  let enter_pattern = ({ppat_desc: desc, ppat_loc: loc} as p) => {
+    switch (desc) {
+    | PPatConstant(PConstString(s)) =>
+      if (!Utf8.validString(s)) {
+        errs := [MalformedString(loc), ...errs^];
+      }
+    | _ => ()
+    };
+    super.enter_pattern(p);
+  };
+
   {
     errs,
     iter_hooks: {
       ...super,
       enter_expression,
+      enter_pattern,
     },
   };
 };
@@ -145,11 +169,28 @@ let malformed_characters = (errs, super) => {
     super.enter_expression(e);
   };
 
+  let enter_pattern = ({ppat_desc: desc, ppat_loc: loc} as p) => {
+    switch (desc) {
+    | PPatConstant(PConstChar(c)) =>
+      switch (
+        String_utils.Utf8.utf_length_at_offset(c, 0) == String.length(c)
+      ) {
+      | true => ()
+      | false
+      | exception (Invalid_argument(_)) =>
+        errs := [IllegalCharacterLiteral(c, loc), ...errs^]
+      }
+    | _ => ()
+    };
+    super.enter_pattern(p);
+  };
+
   {
     errs,
     iter_hooks: {
       ...super,
       enter_expression,
+      enter_pattern,
     },
   };
 };
@@ -585,6 +626,7 @@ let no_local_include = (errs, super) => {
 type provided_multiple_times_ctx = {
   modules: Hashtbl.t(string, unit),
   types: Hashtbl.t(string, unit),
+  exceptions: Hashtbl.t(string, unit),
   values: Hashtbl.t(string, unit),
 };
 
@@ -625,6 +667,7 @@ let provided_multiple_times = (errs, super) => {
       {
         modules: Hashtbl.create(64),
         types: Hashtbl.create(64),
+        exceptions: Hashtbl.create(64),
         values: Hashtbl.create(64),
       },
     ]);
@@ -635,6 +678,7 @@ let provided_multiple_times = (errs, super) => {
         {
           modules: Hashtbl.create(64),
           types: Hashtbl.create(64),
+          exceptions: Hashtbl.create(64),
           values: Hashtbl.create(64),
         },
         ...ctx^,
@@ -648,7 +692,7 @@ let provided_multiple_times = (errs, super) => {
   };
 
   let enter_toplevel_stmt = ({ptop_desc: desc} as top) => {
-    let {values, modules, types} = List.hd(ctx^);
+    let {values, modules, types, exceptions} = List.hd(ctx^);
     switch (desc) {
     | PTopModule(Provided | Abstract, {pmod_name, pmod_loc}) =>
       if (Hashtbl.mem(modules, pmod_name.txt)) {
@@ -733,6 +777,13 @@ let provided_multiple_times = (errs, super) => {
             } else {
               Hashtbl.add(types, name, ());
             };
+          | PProvideException({name, alias, loc}) =>
+            let (_, name) = apply_alias(name, alias);
+            if (Hashtbl.mem(exceptions, name)) {
+              errs := [ProvidedMultipleTimes(name, loc), ...errs^];
+            } else {
+              Hashtbl.add(exceptions, name, ());
+            };
           | PProvideModule({name, alias, loc}) =>
             let (_, name) = apply_alias(name, alias);
             if (Hashtbl.mem(modules, name)) {
@@ -773,6 +824,37 @@ let provided_multiple_times = (errs, super) => {
   };
 };
 
+let mutual_rec_type_improper_rec_keyword = (errs, super) => {
+  let enter_toplevel_stmt = ({ptop_desc: desc, ptop_loc: loc} as e) => {
+    switch (desc) {
+    | PTopData([(_, first_decl), ...[_, ..._] as rest_decls]) =>
+      if (first_decl.pdata_rec != Recursive) {
+        errs := [MutualRecTypesMissingRec(loc), ...errs^];
+      } else {
+        List.iter(
+          ((_, decl)) =>
+            switch (decl) {
+            | {pdata_rec: Recursive} =>
+              errs := [MutualRecExtraneousNonfirstRec(loc), ...errs^]
+            | _ => ()
+            },
+          rest_decls,
+        );
+      }
+    | _ => ()
+    };
+    super.enter_toplevel_stmt(e);
+  };
+
+  {
+    errs,
+    iter_hooks: {
+      ...super,
+      enter_toplevel_stmt,
+    },
+  };
+};
+
 let compose_well_formedness = ({errs, iter_hooks}, cur) =>
   cur(errs, iter_hooks);
 
@@ -789,6 +871,7 @@ let well_formedness_checks = [
   malformed_return_statements,
   no_local_include,
   provided_multiple_times,
+  mutual_rec_type_improper_rec_keyword,
 ];
 
 let well_formedness_checker = () =>

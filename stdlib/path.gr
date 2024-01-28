@@ -79,18 +79,18 @@ record TFileType<a> {
 }
 
 // Rel(Number) represents the number of directories up from the base point
-enum Base {
+enum rec Base {
   Rel(Number),
   Abs(AbsoluteRoot),
-},
-type PathInfo = (Base, FileType, List<String>),
-record TBase<a> {
+}
+and type PathInfo = (Base, FileType, List<String>)
+and record TBase<a> {
   base: Base,
-},
+}
 /**
  * Represents an absolute path's anchor point.
  */
-provide enum AbsoluteRoot {
+and provide enum AbsoluteRoot {
   Root,
   Drive(Char),
 }
@@ -129,11 +129,11 @@ abstract record Directory {
  * Represents a path typed on (`Absolute` or `Relative`) and (`File` or
  * `Directory`)
  */
-abstract type TypedPath<a, b> = (TBase<a>, TFileType<b>, List<String>),
+abstract type rec TypedPath<a, b> = (TBase<a>, TFileType<b>, List<String>)
 /**
  * Represents a system path.
  */
-provide enum Path {
+and provide enum Path {
   AbsoluteFile(TypedPath<Absolute, File>),
   AbsoluteDir(TypedPath<Absolute, Directory>),
   RelativeFile(TypedPath<Relative, File>),
@@ -635,10 +635,10 @@ let ancestryHelper = (base: PathInfo, path: PathInfo) => {
  *
  * @since v0.5.5
  */
-provide let ancestry = (path1: Path, path2: Path) => {
-  let pathInfo1 = pathInfo(path1)
+provide let ancestry = (base: Path, path: Path) => {
+  let pathInfo1 = pathInfo(base)
   let (base1, _, _) = pathInfo1
-  let pathInfo2 = pathInfo(path2)
+  let pathInfo2 = pathInfo(path)
   let (base2, _, _) = pathInfo2
   match ((base1, base2)) {
     (Rel(_), Abs(_)) | (Abs(_), Rel(_)) => Err(DifferentBases),

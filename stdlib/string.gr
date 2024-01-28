@@ -10,6 +10,7 @@
 
 module String
 
+include "char"
 include "runtime/unsafe/wasmi32"
 include "runtime/unsafe/memory"
 include "runtime/exception"
@@ -96,6 +97,21 @@ provide let length = (string: String) => {
 provide let byteLength = (string: String) => {
   let string = WasmI32.fromGrain(string)
   Conv.wasmI32ToNumber(WasmI32.load(string, 4n))
+}
+
+/**
+ * Determines if the string contains no characters.
+ *
+ * @param string: The string to inspect
+ * @returns `true` if the string is empty and `false` otherwise
+ *
+ * @since v0.6.0
+ */
+@unsafe
+provide let isEmpty = (string: String) => {
+  from WasmI32 use { (==) }
+  let strPtr = WasmI32.fromGrain(string)
+  WasmI32.load(strPtr, 4n) == 0n
 }
 
 /**
@@ -701,7 +717,9 @@ provide let contains = (search: String, string: String) => {
   string += 8n
   search += 8n
 
-  let mut j = 0n, k = 0n, ell = 0n
+  let mut j = 0n
+  and k = 0n
+  and ell = 0n
 
   if (m > n) {
     // Bail if pattern length is longer than input length
@@ -1923,7 +1941,7 @@ provide let decodeKeepBom = (bytes: Bytes, encoding: Encoding) => {
  * @since v0.4.0
  */
 @unsafe
-provide let forEachCodePoint = (fn: Number -> Void, str: String) => {
+provide let forEachCodePoint = (fn: Number => Void, str: String) => {
   from WasmI32 use { (+), (-), (&), (>>>), ltU as (<), leU as (<=), (==) }
 
   let strPtr = WasmI32.fromGrain(str)
@@ -1975,7 +1993,7 @@ provide let forEachCodePoint = (fn: Number -> Void, str: String) => {
  * @since v0.4.0
  */
 @unsafe
-provide let forEachCodePointi = (fn: (Number, Number) -> Void, str: String) => {
+provide let forEachCodePointi = (fn: (Number, Number) => Void, str: String) => {
   from WasmI32 use { (+), (-), (&), (>>>), ltU as (<), leU as (<=), (==) }
 
   let strPtr = WasmI32.fromGrain(str)
@@ -2015,13 +2033,10 @@ provide let forEachCodePointi = (fn: (Number, Number) -> Void, str: String) => {
 }
 
 @unsafe
-let trimString = (str: String, fromEnd: Bool) => {
+let trimString = (stringPtr: WasmI32, byteLength: WasmI32, fromEnd: Bool) => {
   from WasmI32 use { (+), (-), (*), (>>>), ltU as (<), (==), (!=) }
-
-  let mut stringPtr = WasmI32.fromGrain(str)
-  let byteLength = WasmI32.load(stringPtr, 4n)
-  stringPtr += 8n
-  let mut i = 0n, offset = 1n
+  let mut i = 0n
+  and offset = 1n
   if (fromEnd) {
     i = byteLength - 1n
     offset = -1n
@@ -2065,14 +2080,7 @@ let trimString = (str: String, fromEnd: Bool) => {
     }
     count += 1n
   }
-  let str = allocateString(byteLength - count)
-  // Copy the string
-  if (fromEnd) {
-    Memory.copy(str + 8n, stringPtr, byteLength - count)
-  } else {
-    Memory.copy(str + 8n, stringPtr + count, byteLength - count)
-  }
-  WasmI32.toGrain(str): String
+  count
 }
 /**
  * Trims the beginning of a string—removing any leading whitespace characters.
@@ -2084,7 +2092,17 @@ let trimString = (str: String, fromEnd: Bool) => {
  *
  * @since v0.4.2
  */
-provide let trimStart = (string: String) => trimString(string, false)
+@unsafe
+provide let trimStart = (string: String) => {
+  from WasmI32 use { (-), (+) }
+  let mut stringPtr = WasmI32.fromGrain(string)
+  let byteLength = WasmI32.load(stringPtr, 4n)
+  stringPtr += 8n
+  let count = trimString(stringPtr, byteLength, false)
+  let str = allocateString(byteLength - count)
+  Memory.copy(str + 8n, stringPtr + count, byteLength - count)
+  WasmI32.toGrain(str): String
+}
 /**
  * Trims the end of a string—removing any trailing whitespace characters.
  *
@@ -2095,7 +2113,17 @@ provide let trimStart = (string: String) => trimString(string, false)
  *
  * @since v0.4.2
  */
-provide let trimEnd = (string: String) => trimString(string, true)
+@unsafe
+provide let trimEnd = (string: String) => {
+  from WasmI32 use { (-), (+) }
+  let mut stringPtr = WasmI32.fromGrain(string)
+  let byteLength = WasmI32.load(stringPtr, 4n)
+  stringPtr += 8n
+  let count = trimString(stringPtr, byteLength, true)
+  let str = allocateString(byteLength - count)
+  Memory.copy(str + 8n, stringPtr, byteLength - count)
+  WasmI32.toGrain(str): String
+}
 /**
  * Trims a string—removing all leading and trailing whitespace characters.
  *
@@ -2106,4 +2134,58 @@ provide let trimEnd = (string: String) => trimString(string, true)
  *
  * @since v0.4.2
  */
-provide let trim = (string: String) => trimEnd(trimStart(string))
+@unsafe
+provide let trim = (string: String) => {
+  from WasmI32 use { (-), (+), (==) }
+  let mut stringPtr = WasmI32.fromGrain(string)
+  let byteLength = WasmI32.load(stringPtr, 4n)
+  stringPtr += 8n
+  let startCount = trimString(stringPtr, byteLength, false)
+  if (startCount == byteLength) return ""
+  let endCount = trimString(stringPtr, byteLength, true)
+  let str = allocateString(byteLength - startCount - endCount)
+  Memory.copy(
+    str + 8n,
+    stringPtr + startCount,
+    byteLength - startCount - endCount
+  )
+  return WasmI32.toGrain(str): String
+}
+
+/**
+ * Converts all ASCII uppercase characters in the string to lowercase.
+ * 
+ * @param string: The string to convert
+ * @returns The lowercased string
+ * 
+ * @example assert String.toAsciiLowercase("aBc123") == "abc123"
+ * 
+ * @since v0.6.0
+ */
+provide let toAsciiLowercase = string => {
+  let chars = explode(string)
+  let len = arrayLength(chars)
+  for (let mut i = 0; i < len; i += 1) {
+    chars[i] = Char.toAsciiLowercase(chars[i])
+  }
+  implode(chars)
+}
+
+/**
+ * Converts all ASCII lowercase characters in the string to uppercase.
+ * 
+ * @param string: The string to convert
+ * @returns The uppercased string
+ * 
+ * @example assert String.toAsciiUppercase("aBc123") == "ABC123"
+ * 
+ * @since v0.6.0
+ */
+provide let toAsciiUppercase = string => {
+  let chars = explode(string)
+  let len = arrayLength(chars)
+  for (let mut i = 0; i < len; i += 1) {
+    chars[i] = Char.toAsciiUppercase(chars[i])
+  }
+  implode(chars)
+}

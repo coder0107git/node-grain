@@ -157,6 +157,12 @@ module type Sourcetree = {
         loc: Location.t,
         definition: option(Location.t),
       })
+    | Exception({
+        ident: Ident.t,
+        ext: Types.extension_constructor,
+        loc: Location.t,
+        definition: option(Location.t),
+      })
     | Module({
         path: Path.t,
         decl: Types.module_declaration,
@@ -233,6 +239,12 @@ module Sourcetree: Sourcetree = {
     | Declaration({
         ident: Ident.t,
         decl: Types.type_declaration,
+        loc: Location.t,
+        definition: option(Location.t),
+      })
+    | Exception({
+        ident: Ident.t,
+        ext: Types.extension_constructor,
         loc: Location.t,
         definition: option(Location.t),
       })
@@ -387,6 +399,15 @@ module Sourcetree: Sourcetree = {
                                    definition: Some(value.val_loc),
                                  }),
                                )
+                             | TUseException({name, ext, loc}) => (
+                                 loc_to_interval(loc),
+                                 Exception({
+                                   ident: Ident.create(name),
+                                   ext,
+                                   loc,
+                                   definition: Some(ext.ext_loc),
+                                 }),
+                               )
                              }
                            },
                            items,
@@ -394,6 +415,20 @@ module Sourcetree: Sourcetree = {
                        },
                   ]
                   @ segments^;
+              | TExpConstruct(_, desc, _) =>
+                segments :=
+                  [
+                    (
+                      loc_to_interval(exp.exp_loc),
+                      Value({
+                        env: exp.exp_env,
+                        value_type: desc.cstr_res,
+                        loc: exp.exp_loc,
+                        definition: Some(desc.cstr_loc),
+                      }),
+                    ),
+                    ...segments^,
+                  ]
               | _ =>
                 segments :=
                   [

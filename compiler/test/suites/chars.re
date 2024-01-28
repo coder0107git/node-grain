@@ -33,8 +33,10 @@ describe("chars", ({test, testSkip}) => {
     },
     loc_ghost: false,
   };
-  let char = (~loc=?, s) =>
-    Toplevel.expr(~loc?) @@ Expression.constant(~loc?, Constant.char(s));
+  let char = (~loc=?, s) => {
+    let loc = Option.value(~default=Location.dummy_loc, loc);
+    Toplevel.expr(~loc) @@ Expression.constant(~loc, Constant.char(s));
+  };
 
   assertRun("char1", "print('A')", "A\n");
   assertSnapshot("char2", "'\\x41'");
@@ -81,6 +83,11 @@ Did you mean to create the string "\{\\"test\\": 1\}" instead?|},
     "char_illegal3",
     "''",
     "This character literal contains no character. Did you mean to create an empty string \"\" instead?",
+  );
+  assertCompileError(
+    "char_illegal_pattern",
+    "match ('a') { 'abc' => void, _ => void }",
+    "This character literal contains multiple characters: 'abc'\nDid you mean to create the string \"abc\" instead?",
   );
   assertCompileError(
     "unicode_err1",
