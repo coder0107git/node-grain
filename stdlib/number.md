@@ -59,7 +59,7 @@ Euler's number represented as a Number value.
 ### Number.**(+)**
 
 <details>
-<summary>Added in <code>next</code></summary>
+<summary>Added in <code>0.6.0</code></summary>
 <table>
 <thead>
 <tr><th>version</th><th>changes</th></tr>
@@ -92,7 +92,7 @@ Returns:
 ### Number.**(-)**
 
 <details>
-<summary>Added in <code>next</code></summary>
+<summary>Added in <code>0.6.0</code></summary>
 <table>
 <thead>
 <tr><th>version</th><th>changes</th></tr>
@@ -125,7 +125,7 @@ Returns:
 ### Number.**(*)**
 
 <details>
-<summary>Added in <code>next</code></summary>
+<summary>Added in <code>0.6.0</code></summary>
 <table>
 <thead>
 <tr><th>version</th><th>changes</th></tr>
@@ -158,7 +158,7 @@ Returns:
 ### Number.**(/)**
 
 <details>
-<summary>Added in <code>next</code></summary>
+<summary>Added in <code>0.6.0</code></summary>
 <table>
 <thead>
 <tr><th>version</th><th>changes</th></tr>
@@ -191,7 +191,7 @@ Returns:
 ### Number.**(\*\*)**
 
 <details>
-<summary>Added in <code>next</code></summary>
+<summary>Added in <code>0.6.0</code></summary>
 <table>
 <thead>
 <tr><th>version</th><th>changes</th></tr>
@@ -704,7 +704,7 @@ Returns:
 ### Number.**isClose**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -907,7 +907,7 @@ Returns:
 ### Number.**asin**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -932,7 +932,7 @@ Returns:
 ### Number.**acos**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -957,7 +957,7 @@ Returns:
 ### Number.**atan**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -1094,7 +1094,7 @@ Returns:
 ### Number.**clamp**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -1120,7 +1120,7 @@ Returns:
 ### Number.**linearInterpolate**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
@@ -1154,7 +1154,7 @@ Throws:
 ### Number.**linearMap**
 
 <details disabled>
-<summary tabindex="-1">Added in <code>next</code></summary>
+<summary tabindex="-1">Added in <code>0.6.0</code></summary>
 No other changes yet.
 </details>
 
